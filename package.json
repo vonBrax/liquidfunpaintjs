@@ -1,0 +1,35 @@
+{
+  "name": "liquidfunpaint",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --mode development"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.18.0",
+    "@typescript-eslint/parser": "^2.18.0",
+    "body-parser": "^1.19.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "express": "^4.17.1",
+    "gl-matrix": "^3.1.0",
+    "prettier": "^1.19.1",
+    "rxjs": "^6.5.4",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-dev-server": "^3.10.2"
+  },
+  "devDependencies": {
+    "@types/emscripten": "^1.39.1",
+    "@types/gl-matrix": "^2.4.5",
+    "html-webpack-plugin": "^3.2.0",
+    "webpack-cli": "^3.3.10"
+  }
+}

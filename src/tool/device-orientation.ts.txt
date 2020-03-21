@@ -1,0 +1,427 @@
+// DEVICE ORIENTATION:
+// https://github.com/dorukeker/gyronorm.js
+// https://github.com/wagerfield/parallax
+
+class SensorManager {
+  private MAGIC_NUMBER = 30;
+
+  private enabled = false;
+
+  private isDesktop: boolean;
+  private motionSupport: boolean;
+  private orientationSupport: boolean;
+  private portrait: boolean;
+
+  private orientationStatus = 0;
+  private motionStatus = 0;
+
+  constructor() {
+    this.isDesktop = !navigator.userAgent.match(
+      /(iPhone|iPod|iPad|Android|BlackBerry|BB10|mobi|tablet|opera mini|nexus 7)/i,
+    );
+    this.motionSupport = !!window.DeviceMotionEvent && !this.isDesktop;
+    this.orientationSupport =
+      !!window.DeviceOrientationEvent && !this.isDesktop;
+
+    this.initialize();
+  }
+
+  private initialize(): void {
+    this.enable();
+    // this.queueCalibration(this.calibrationDelay)
+  }
+
+  private enable(): void {
+    if (this.enabled) {
+      return;
+    }
+
+    this.enabled = true;
+
+    if (this.orientationSupport) {
+      this.portrait = false;
+      window.addEventListener('deviceorientation', this.onDeviceOrientation);
+      // this.detectionTimer = setTimeout(this.onOrientationTimer, this.supportDelay);
+    } else if (this.motionSupport) {
+      this.portrait = false;
+      window.addEventListener('devicemotion', this.onDeviceMotion);
+      // this.detectionTimer = setTimeout(this.onMotionTimer, this.supportDelay);
+    } else {
+      // this.calibrationX = 0
+      // this.calibrationY = 0
+      // this.portrait = false
+      // window.addEventListener('mousemove', this.onMouseMove)
+      // this.doReadyCallback()
+    }
+  }
+  private disable(): void {
+    if (!this.enabled) {
+      return;
+    }
+
+    this.enabled = false;
+    if (this.orientationSupport) {
+      window.removeEventListener('deviceorientation', this.onDeviceOrientation);
+    } else if (this.motionSupport) {
+      window.removeEventListener('devicemotion', this.onDeviceMotion);
+    } else {
+      // window.removeEventListener('mousemove', this.onMouseMove);
+    }
+  }
+
+  public onDeviceOrientation(event: DeviceOrientationEvent): void {
+    const { beta, gamma } = event;
+    if (beta !== null && gamma !== null) {
+      this.orientationStatus = 1;
+      this.rotate(beta, gamma);
+    }
+  }
+
+  public rotate(beta = 0, gamma = 0): void {
+    // Extract rotation
+    const x = beta / this.MAGIC_NUMBER; // -90 :: 90
+    const y = gamma / this.MAGIC_NUMBER; // -180 :: 180
+
+    // Detect orientation change
+    const portrait = window.innerHeight > window.innerWidth;
+    if (this.portrait !== portrait) {
+      this.portrait = portrait;
+      // this.calibrationFlag = true;
+    }
+
+    // if (this.calibrationFlag) {
+    //   this.calibrationFlag = false;
+    //   this.calibrationX = x;
+    //   this.calibrationY = y;
+    // }
+
+    // this.inputX = x;
+    // this.inputY = y;
+  }
+
+  public onDeviceMotion(event: DeviceMotionEvent): void {
+    const { beta, gamma } = event.rotationRate;
+
+    if (beta !== null && gamma !== null) {
+      this.motionStatus = 1;
+      this.rotate(beta, gamma);
+    }
+  }
+
+  public onOrientationTimer(): void {
+    if (this.orientationSupport && this.orientationStatus === 0) {
+      this.disable();
+      this.orientationSupport = false;
+      this.enable();
+    } else {
+      this.doReadyCallback();
+    }
+  }
+
+  public onMotionTimer(): void {
+    if (this.motionSupport && this.motionStatus === 0) {
+      this.disable();
+      this.motionSupport = false;
+      this.enable();
+    } else {
+      this.doReadyCallback();
+    }
+  }
+
+  // public doReadyCallback(): void {
+  //   if (this.onReady) {
+  //     this.onReady();
+  //   }
+  // }
+
+  // END PARALLAX
+}
+
+interface DebounceOptions {
+  leading?: boolean;
+  maxWait?: number;
+  trailing?: boolean;
+  useRAF?: boolean;
+}
+function debounce(
+  func: () => {},
+  wait = 0,
+  options: DebounceOptions,
+): () => {} {
+  const leading = !!options.leading;
+  const maxing = 'maxWait' in options;
+  const maxWait = maxing ? Math.max(options.maxWait || 0, wait) : undefined;
+  const trailing = 'trailing' in options ? options.trailing : undefined;
+
+  const useRAF =
+    options.useRAF && typeof window.requestAnimationFrame === 'function';
+
+  let lastInvokeTime = 0;
+  let lastArgs;
+  let lastThis;
+  let result;
+  let timerId: number;
+
+  function invokeFunc(time: number): any {
+    const args = lastArgs;
+    const thisArg = lastThis;
+
+    lastArgs = lastThis = null;
+    lastInvokeTime = time;
+    result = func.apply(thisArg, args);
+    return result;
+  }
+
+  function startTimer(pendingFunc: () => {}, wait: number): number {
+    if (useRAF) {
+      window.cancelAnimationFrame(timerId);
+      return window.requestAnimationFrame(pendingFunc);
+    }
+
+    return window.setTimeout(pendingFunc, wait);
+  }
+
+  function cancelTimer(id: number): void {
+    if (useRAF) {
+      return window.cancelAnimationFrame(id);
+    }
+    clearTimeout(id);
+  }
+
+  function leadingEdge(time: number): any {
+    // Reset any `maxWait` timer.
+    lastInvokeTime = time;
+    // Start the timer for the traling edge.
+    timerId = startTimer(timerExpired, wait);
+    // Invoke the leading edge.
+    return leading ? invokeFunc(time) : result;
+  }
+
+  let lastCallTime: number;
+  function remainingWait(time: number): number {
+    const timeSinceLastCall = time - lastCallTime;
+    const timeSinceLastInvoke = time - lastInvokeTime;
+    const timeWaiting = wait - timeSinceLastCall;
+
+    return maxing
+      ? Math.min(timeWaiting, maxWait - timeSinceLastInvoke)
+      : timeWaiting;
+  }
+
+  function shouldInvoke(time: number): boolean {
+    const timeSinceLastCall = time - lastCallTime;
+    const timeSinceLastInvoke = time - lastInvokeTime;
+
+    // Either this is the first call, activity has stopped and we're at the
+    // trailing edge, the system time has gone backwards and we're treating
+    // it as the trailing edge, or we've hit the `maxWait` limit.
+    return (
+      lastCallTime === undefined ||
+      timeSinceLastCall >= wait ||
+      timeSinceLastCall < 0 ||
+      (maxing && timeSinceLastInvoke >= maxWait)
+    );
+  }
+
+  function trailingEdge(time: number): any {
+    timerId = null;
+
+    // Only invoke if we have `lastArgs` which means `func` has been
+    // debounced at least once.
+    if (trailing && lastArgs) {
+      return invokeFunc(time);
+    }
+    lastArgs = lastThis = null;
+
+    return result;
+  }
+
+  function timerExpired(): any {
+    const time = Date.now();
+    if (shouldInvoke(time)) {
+      return trailingEdge(time);
+    }
+
+    // Restart the timer.
+    timerId = startTimer(timerExpired, remainingWait(time));
+  }
+
+  function cancel(): void {
+    if (timerId !== null) {
+      cancelTimer(timerId);
+    }
+
+    lastInvokeTime = 0;
+    lastArgs = lastCallTime = lastThis = timerId = null;
+  }
+
+  function flush(): any {
+    return timerId === null ? result : trailingEdge(Date.now());
+  }
+
+  function pending(): boolean {
+    return timerId !== null;
+  }
+
+  function debounced(...args) {
+    const time = Date.now();
+    const isInvoking = shouldInvoke(time);
+
+    lastArgs = args;
+    lastThis = this;
+    lastCallTime = time;
+
+    if (isInvoking) {
+      if (timerId === null) {
+        return leadingEdge(lastCallTime);
+      }
+      if (maxing) {
+        // Handle invocations in a tight loop.
+        timerId = startTimer(timerExpired, wait);
+        return invokeFunc(lastCallTime);
+      }
+    }
+
+    if (timerId === null) {
+      timerId = startTimer(timerExpired, wait);
+    }
+
+    return result;
+  }
+
+  debounced.cancel = cancel;
+  debounced.flush = flush;
+  debounced.pending = pending;
+
+  return debounced;
+}
+
+function throttle(
+  func: () => {},
+  wait: number,
+  options: DebounceOptions,
+): () => {} {
+  const leading = options.leading || true;
+  const trailing = options.trailing || true;
+
+  return debounce(func, wait, { leading, trailing, maxWait: wait });
+}
+
+interface DeviceOrientation {
+  alpha: number;
+  beta: number;
+  gama: number;
+  absolute: boolean;
+}
+
+interface DeviceMotion {
+  x: number;
+  y: number;
+  z: number;
+  gx: number;
+  gy: number;
+  gz: number;
+  alpha: number;
+  beta: number;
+  gamma: number;
+}
+
+interface SensorManagerOptions {
+  frequency?: number;
+  gravityNormalized?: boolean;
+  orientationBase?: number;
+  decimalCount?: number;
+  sscreenAdjusted?: boolean;
+}
+
+enum OrientationBase {
+  GAME = 'game',
+  WORLD = 'world',
+}
+
+class SensorManager2 {
+  private static GAME = 'game';
+  private static WORLD = 'world';
+  private static DEVICE_ORIENTATION = 'deviceorientation';
+  private static ACCELERATION = 'acceleration';
+  private static ACCELERATION_INCLUDING_GRAVITY =
+    'accelerationincludinggravity';
+  private static ROTATION_RATE = 'rotationrate';
+
+  // Timer to return values
+  private interval: number = null;
+
+  // Flag if calibrating
+  private isCalibrating = false;
+
+  // Alpha offset value
+  private calibrationValue = 0;
+
+  // Coefficient to normalze gravity related values
+  private gravityCoefficient = 0;
+
+  // Boolean value if GyroNorm is tracking
+  private isRunning = false;
+
+  // Boolean value if GyroNorm is is initialized
+  private isReady = false;
+
+  // Object to store the device orientation values
+  private orientation: DeviceOrientation = null;
+
+  // Object to store the device motion values
+  private motion: DeviceMotion = null;
+
+  public frequency: number;
+  public gravityNormalized: boolean;
+  public orientationBase: OrientationBase;
+  public decimalCount: number;
+  public screenAdjusted: boolean;
+
+  constructor(options?: SensorManagerOptions) {
+    this.orientation = {
+      alpha: 0,
+      beta: 0,
+      gama: 0,
+      absolute: false,
+    };
+
+    this.motion = {
+      x: 0,
+      y: 0,
+      z: 0,
+      gx: 0,
+      gy: 0,
+      gz: 0,
+      alpha: 0,
+      beta: 0,
+      gamma: 0,
+    };
+
+    this.init(options || {});
+  }
+
+  public init({
+    frequency = 50,
+    gravityNormalized = true,
+    orientationBase = OrientationBase.GAME,
+    decimalCount = 2,
+    screenAdjusted = false,
+  }): void {
+    this.frequency = frequency;
+    this.gravityNormalized = gravityNormalized;
+    this.orientationBase = orientationBase;
+    this.decimalCount = decimalCount;
+    this.screenAdjusted = screenAdjusted;
+  }
+}
+
+class DeviceOrientation {
+  private tries = 0;
+  private maxTries = 200;
+  private successCount = 0;
+  private successThreshold = 10;
+
+  public alphaOffsetScreen = 0;
+  // public alpha
+}

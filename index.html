@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>SUPER COOL</title>
+</head>
+<body>
+  <h1>LIQUIDFUN PAINT!</h1>
+  <button id="reset" type="button">RESET</button>
+  <div style="position:relative">
+    <canvas id="canvas" style="outline: 1px solid black"></canvas>
+    <div id="log" style="white-space: pre-line; padding: 1rem; position: absolute; right: 0; top: 0; font-size:0.75rem"></div>
+  </div>
+
+  <div style="display: flex; justify-content: space-evenly;">
+
+    <div id="tools">
+      <p>Tool</p>
+      <div>
+        <label>
+          <input type="radio" name="tool" value="WATER" checked>
+          Water
+        </label>
+      </div>
+      <div>
+        <label>
+          <input type="radio" name="tool" value="RIGID">
+          Rigid
+        </label>
+      </div>
+    </div>
+
+    <div id="colors" style="display: flex">
+      <div>
+        <p>Color</p>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ffdcb8ff">
+            <span style="color: #dcb8ff; background-color: #dcb8ff">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ffb9b7ff">
+            <span style="color: #b9b7ff; background-color: #b9b7ff">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff8c9dff">
+            <span style="color: #8c9dff; background-color: #8c9dff">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff71a0f0">
+            <span style="color: #71a0f0; background-color: #71a0f0">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff55abff">
+            <span style="color: #55abff; background-color: #55abff">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff63cee4" checked>
+            <span style="color: #63cee4; background-color: #63cee4">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff75ccc7">
+            <span style="color: #75ccc7; background-color: #75ccc7">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff98e1c8">
+            <span style="color: #98e1c8; background-color: #98e1c8">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ffb4e5af">
+            <span style="color: #b4e5af; background-color: #b4e5af">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ffc0eba8">
+            <span style="color: #c0eba8; background-color: #c0eba8">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ffe7f39f">
+            <span style="color: #e7f39f; background-color: #e7f39f">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ffe89a3a">
+            <span style="color: #e89a3a; background-color: #e89a3a">AI</span>
+          </label>
+        </div>
+      </div>
+      <div>
+        <p>&nbsp;</p>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ffe44426">
+            <span style="color: #e44426; background-color: #e44426">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ffb5303b">
+            <span style="color: #b5303b; background-color: #b5303b">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff6a2531">
+            <span style="color: #6a2531; background-color: #6a2531">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ffd8336e">
+            <span style="color: #d8336e; background-color: #d8336e">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ffad4893">
+            <span style="color: #ad4893; background-color: #ad4893">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff522fa6">
+            <span style="color: #522fa6; background-color: #522fa6">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff2547b0">
+            <span style="color: #2547b0; background-color: #2547b0">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff009100">
+            <span style="color: #009100; background-color: #009100">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff06a481">
+            <span style="color: #06a481; background-color: #06a481">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff563c3b">
+            <span style="color: #563c3b; background-color: #563c3b">AI</span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ff0a0a0a">
+            <span style="color: #0a0a0a; background-color: #0a0a0a">AI</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <style>
+    body {
+      margin: 0;
+    }
+    #canvas {
+      width: 100%;
+      height: 80vh;
+      height: 50vh;
+      /* width: 256px;
+      height: 256px; */
+    }
+  </style>
+  <!-- <script src="src/liquidfun/a.out.js"></script> -->
+  <script src="src/liquidfun/a.out.js"></script>
+  <!-- <script src="dist/bundle.js"></script> -->
+  <script>
+    window.__caipps__ = window.__caipps__ || {};
+    const canvas = document.getElementById('canvas');
+    const gl = canvas.getContext('webgl');
+    window.__caipps__.canvas = canvas;
+    window.__caipps__.context = gl;
+
+    Module.onRuntimeInitialized = function() {
+      // window.__caipps__ = window.__caipps__ || {};
+      // window.__caipps__.runtimeInitialized = true;
+      window.__caipps__.module = Module;
+      window.__caipps__.init(canvas);
+      // window.__caipps__.activity.onCreate('canvas');
+    }
+  </script>
+</body>
+</html>

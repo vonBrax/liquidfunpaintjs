@@ -1,0 +1,41 @@
+{
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    // "plugin:@typescript-eslint/eslint-recommended",
+    // "plugin:@typescript-eslint/recommended",
+    // "prettier/@typescript-eslint",
+    "plugin:prettier/recommended"
+  ],
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "parser": "@typescript-eslint/parser",
+      "extends": [
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "prettier/@typescript-eslint",
+        "plugin:prettier/recommended"
+      ]
+    }
+  ],
+  "env": {
+    "node": true,
+    "es6": true,
+    "browser": true
+  },
+  "parserOptions": {
+    // "parser": "babel-eslint",
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    // "ecmaFeatures": {
+    //   "globalReturn": true,
+    //   "generators": false,
+    //   "objectLiteralDuplicateProperties": false
+    // }
+  },
+  "rules": {
+    "no-console": 0
+  },
+  "ignorePatterns": ["lf_core.js"]
+}
