@@ -566,18 +566,18 @@ export class DebugRenderer {
     const positionBuffer = new Float32Array(
       this.mCirclePositionBuffer.getRawBuffer(),
     );
-    const colorBuffer = new Uint8Array(this.mCircleColorBuffer.getRawBuffer());
+    // const colorBuffer = new Uint8Array(this.mCircleColorBuffer.getRawBuffer());
     const pointSizeBuffer = new Float32Array(
       this.mCirclePointSizeBuffer.getRawBuffer(),
     );
 
-    const msg = `
-      {
-        "position": [${positionBuffer[0]},${positionBuffer[1]},${positionBuffer[2]},${positionBuffer[3]},${positionBuffer[4]}],
-        "color": [${colorBuffer[0]},${colorBuffer[1]},${colorBuffer[2]},${colorBuffer[3]},${colorBuffer[4]}],
-        "pointSize": [${pointSizeBuffer[0]},${pointSizeBuffer[1]},${pointSizeBuffer[2]},${pointSizeBuffer[3]},${pointSizeBuffer[4]}]
-      }
-    `;
+    // const msg = `
+    //   {
+    //     "position": [${positionBuffer[0]},${positionBuffer[1]},${positionBuffer[2]},${positionBuffer[3]},${positionBuffer[4]}],
+    //     "color": [${colorBuffer[0]},${colorBuffer[1]},${colorBuffer[2]},${colorBuffer[3]},${colorBuffer[4]}],
+    //     "pointSize": [${pointSizeBuffer[0]},${pointSizeBuffer[1]},${pointSizeBuffer[2]},${pointSizeBuffer[3]},${pointSizeBuffer[4]}]
+    //   }
+    // `;
     // console.log(JSON.parse(msg));
     // eslint-disable-next-line
     // @ts-ignore

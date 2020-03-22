@@ -1,11 +1,12 @@
 import { Vector2f } from '../util/vector2f';
 import { Log } from '../util/functionsHelper';
-import {
-  createBuffer,
-  destroyBuffer,
-  ParticleBuffer,
-  ArrayViewType,
-} from '../util/wasm-buffer';
+// import {
+//   createBuffer,
+//   destroyBuffer,
+//   ParticleBuffer,
+//   ArrayViewType,
+// } from '../util/wasm-buffer';
+import { ByteBuffer } from '../util/byte-buffer';
 
 /**
  * This is a static buffer for storing generated points per pointer.
@@ -16,7 +17,7 @@ import {
 class PointerInputBuffer {
   private TAG: string;
 
-  static FLUSH_LIMIT = 10;
+  static FLUSH_LIMIT = 40;
 
   // 2 times flush limit for enough padding
   static BLOCK_SIZE = PointerInputBuffer.FLUSH_LIMIT * 2;
@@ -24,18 +25,14 @@ class PointerInputBuffer {
   // Assume maximum of 40 unique pointers on a screen
   static TOTAL_BUFFER_SIZE = PointerInputBuffer.BLOCK_SIZE * 40;
 
-  mByteBuffer: ParticleBuffer;
+  mByteBuffer: ByteBuffer;
   mBufferEnd = 0;
 
   constructor(tag?: string) {
     this.TAG = tag;
-    // const buffer = new ArrayBuffer(PointerInputBuffer.TOTAL_BUFFER_SIZE);
-    // this.mByteBuffer = new Float32Array(buffer);
-    this.mByteBuffer = createBuffer(
-      PointerInputBuffer.TOTAL_BUFFER_SIZE,
-      false,
-      ArrayViewType.FLOAT32,
-    );
+    this.mByteBuffer = new ByteBuffer(PointerInputBuffer.TOTAL_BUFFER_SIZE);
+    this.mByteBuffer.nativeOrder();
+    this.mByteBuffer.createEmbindBuffer();
   }
 
   getNewBlock(): number {
@@ -54,20 +51,25 @@ class PointerInputBuffer {
 
   putPoint(index: number, point: Vector2f): number {
     let currIndex = index;
-    this.mByteBuffer.bufferData.set([point.x], currIndex);
-    currIndex += 1; // this.mByteBuffer.byteLength; // 4
-    this.mByteBuffer.bufferData.set([point.y], currIndex);
-    currIndex += 1; // this.mByteBuffer.byteLength;
+    // this.mByteBuffer.putFloat(currIndex, point.x);
+
+    this.mByteBuffer.putFloat(currIndex, point.x);
+    // this.mByteBuffer.bufferData.set([point.x], currIndex);
+    currIndex += 4; // this.mByteBuffer.byteLength; // 4
+    this.mByteBuffer.putFloat(currIndex, point.y);
+    // this.mByteBuffer.bufferData.set([point.y], currIndex);
+    currIndex += 4; // this.mByteBuffer.byteLength;
 
     return currIndex;
   }
 
   reset(): void {
     // this.mByteBuffer.bufferData.fill(0);
+    this.mByteBuffer.clear();
     this.mBufferEnd = 0;
   }
 
-  getRawBuffer(): ParticleBuffer {
+  getRawBuffer(): ByteBuffer {
     return this.mByteBuffer;
   }
 }
@@ -136,7 +138,7 @@ export class PointerInfo {
     return this.mNumPoints;
   }
 
-  getRawPointsBuffer(): ParticleBuffer {
+  getRawPointsBuffer(): ByteBuffer {
     return PointerInfo.sPointerInputBuffer.getRawBuffer();
   }
 

@@ -1,9 +1,8 @@
 import { PointerInfo } from './pointer-info';
-// import { WaterTool } from './water-tool';
 import { Vector2f } from '../util/vector2f';
 import { Renderer } from '../renderer';
 import { MotionEvent } from './motion-event';
-import { ParticleBuffer } from '../util/wasm-buffer';
+import { ByteBuffer } from '../util/byte-buffer';
 
 /**
  * Type of tools
@@ -93,13 +92,6 @@ function createMatIdentity(): Transform {
  */
 export abstract class Tool {
   private static TAG = 'Tool';
-
-  // static members of the class
-  // private static TOOL_MAP: Map<ToolType, Tool> = Tool.constructToolMap();
-  // public static TOOL_MAP: Map<
-  //   ToolType,
-  //   Tool
-  // > = ToolmapBuilder.constructToolMap();
   public static TOOL_MAP: Map<ToolType, Tool> = new Map();
   protected static MAT_IDENTITY: Transform = createMatIdentity();
 
@@ -137,15 +129,10 @@ export abstract class Tool {
   // This variable is a temporary variable to allow us to destroy particles.
   protected mShape: CircleShape = new Module.CircleShape();
 
-  // /** Initializes all the different tools */
-  // static constructToolMap(): Map<ToolType, Tool> {
-  //   const toolMap: Map<ToolType, Tool> = new Map<ToolType, Tool>();
-
-  //   const waterTool: Tool = new WaterTool();
-  //   toolMap.set(ToolType.WATER, waterTool);
-
-  //   return toolMap;
-  // }
+  /** Initializes all the different tools */
+  // static constructToolMap(): Map<ToolType, Tool>;
+  // Not implemented here due to a cyclic dependency between
+  // the Tool class and the other different tool type classes
 
   /** Returns the tool based on the type */
   static getTool(type: ToolType): Tool {
@@ -161,7 +148,6 @@ export abstract class Tool {
 
   constructor(type: ToolType) {
     this.mType = type;
-    // Tool.TOOL_MAP = ToolmapBuilder.constructToolMap();
   }
 
   public registerTool(type: ToolType, tool: Tool): void {
@@ -192,16 +178,6 @@ export abstract class Tool {
     const r = color & 0xff;
 
     this.mColor.Set(r, g, b, a);
-    console.log(
-      'r: ' +
-        this.mColor.r +
-        ' g: ' +
-        this.mColor.g +
-        ' b: ' +
-        this.mColor.b +
-        ' a: ' +
-        this.mColor.a,
-    );
   }
 
   public getParticleGroupFlags(): number {
@@ -318,16 +294,6 @@ export abstract class Tool {
     const viewHeight = e.container.clientHeight; // worldHeight;
     const viewWidth = e.container.clientWidth; // worldWidth;
 
-    // console.log(
-    //   '%c World: ' + worldWidth + ' x ' + worldHeight,
-    //   'color: green',
-    // );
-    // console.log(
-    //   '%c View: ' + e.container.clientWidth + ' x ' + e.container.clientHeight,
-    //   'color: green',
-    // );
-    // console.log('%c Screen: ' + screenX + ' x ' + screenY, 'color: green');
-
     // screenX and screenY are the coordinates of
     // the pointer event
     const worldPoint = new Vector2f(
@@ -335,11 +301,7 @@ export abstract class Tool {
       (worldHeight * (viewHeight - screenY)) / viewHeight,
     );
 
-    // console.log(Object.assign({}, worldPoint));
-
     this.clampToWorld(worldPoint, radius);
-
-    // console.log({ worldPoint, screenX, screenY });
 
     // Initialize this touch event, specifically the buffers
     this.initPointerInfo(pInfo, worldPoint);
@@ -362,7 +324,6 @@ export abstract class Tool {
 
     // Check if the buffer needs flushing
     if (pInfo.needsFlush()) {
-      // console.log('needs flush');
       this.applyTool(pInfo);
       pInfo.resetBuffer();
     }
@@ -430,7 +391,7 @@ export abstract class Tool {
   protected applyTool(pInfo: PointerInfo): void {
     const radius = this.mBrushSize / 2;
 
-    const buffer: ParticleBuffer = pInfo.getRawPointsBuffer();
+    const buffer: ByteBuffer = pInfo.getRawPointsBuffer();
 
     let pgd: ParticleGroupDef = null;
 
@@ -440,41 +401,28 @@ export abstract class Tool {
       pgd.groupFlags = this.mParticleGroupFlags;
       pgd.linearVelocity = this.mVelocity;
       pgd.SetColor(this.mColor.r, this.mColor.g, this.mColor.b, this.mColor.a);
-      /**
-       * @todo
-       * See if Embind will pick up the pointer to the buffer,
-       * or if we need to manually do this work
-       */
-      const pointer = buffer.pointer;
-      const offset = pInfo.getBufferStart();
-      const byteLen = buffer.bufferData.byteLength;
-      console.log({ offset, radius, points: pInfo.getNumPoints() });
+      buffer.position(pInfo.getBufferStart());
+
+      buffer.sendToEmbind();
 
       pgd.SetCircleShapesFromVertexList(
-        pointer + offset * byteLen,
+        buffer.getPointer(),
         pInfo.getNumPoints(),
         radius,
       );
     }
 
     const ps: ParticleSystem = Renderer.getInstance().acquireParticleSystem();
-    // console.log(ps.GetParticleCount());
+
     try {
       if (this.mOperations.has(ToolOperation.REMOVE_PARTICLES)) {
+        buffer.position(pInfo.getBufferStart());
         this.mShape.radius = radius;
+
         // Goes through each (x,y) pair and queries for the particles in
         // the circle shape to be destroyed.
-        let start = pInfo.getBufferStart();
         for (let i = 0; i < pInfo.getNumPoints(); ++i) {
-          /**
-           * @todo:
-           * Check if this code does what it is supposed to do
-           */
-          const x = buffer.bufferData[start + i];
-          start++;
-          const y = buffer.bufferData[start + i];
-          start++;
-          this.mShape.SetPosition(x, y);
+          this.mShape.SetPosition(buffer.getFloat(), buffer.getFloat());
           ps.DestroyParticlesInShape(this.mShape, Tool.MAT_IDENTITY);
         }
       }

@@ -4,6 +4,7 @@ import { ShaderProgram } from './shader/shader-program';
 import { Texture } from './shader/texture';
 import { Renderer } from './renderer';
 import { state } from './state';
+import { ByteBuffer } from './util/byte-buffer';
 
 /**
  * Renderer to draw textures.
@@ -15,21 +16,30 @@ export class TextureRenderer {
   // Temporary variables for drawing purposes
   private uvTransform: mat4 = mat4.create();
 
-  private mPositionBuffer: WebGLBuffer;
-  private mTexCoordBuffer: WebGLBuffer;
+  private mPositionBuffer: ByteBuffer;
+  private mTexCoordBuffer: ByteBuffer;
 
   private static INSTANCE: TextureRenderer = new TextureRenderer();
 
   constructor() {
-    const gl: WebGL2RenderingContext = state.get(
-      'context',
-    ) as WebGL2RenderingContext;
-    this.mPositionBuffer = gl.createBuffer();
+    this.mPositionBuffer = new ByteBuffer(8 * 4);
+    this.mPositionBuffer.nativeOrder();
+    this.mPositionBuffer.createGLBuffer();
 
     const data = [0, 0, 1, 0, 0, 1, 1, 1];
-    this.mTexCoordBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.mTexCoordBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+    this.mTexCoordBuffer = new ByteBuffer(8 * 4);
+    this.mTexCoordBuffer.nativeOrder();
+    this.mTexCoordBuffer.createGLBuffer();
+    this.mTexCoordBuffer.put(new Float32Array(data));
+
+    // Buffer data once for the texCoordBuffer
+    const gl = state.get('context') as WebGLRenderingContext;
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.mTexCoordBuffer.glBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(this.mTexCoordBuffer.getRawBuffer()),
+      gl.STATIC_DRAW,
+    );
   }
 
   /**
@@ -78,26 +88,6 @@ export class TextureRenderer {
    * @param right Right coordinate of a rectangle to draw the texture within
    * @param top Top coordinate of a rectangle to draw the texture within
    */
-  // public drawTexture(
-  //   texture: Texture,
-  //   transform: number[],
-  //   left: number,
-  //   bottom: number,
-  //   right: number,
-  //   top: number,
-  // ): void {
-  //   this.drawTexture(
-  //     texture,
-  //     transform,
-  //     Renderer.MAT4X4_IDENTITY,
-  //     left,
-  //     bottom,
-  //     right,
-  //     top,
-  //     1.0,
-  //     false,
-  //   );
-  // }
 
   /**
    * Draw a texture within a rectangle.
@@ -129,24 +119,9 @@ export class TextureRenderer {
       'context',
     ) as WebGLRenderingContext;
 
-    const positionData = this.setRect(left, bottom, right, top);
+    this.setRect(left, bottom, right, top);
 
-    // this.uvTransform = Arrays.copyOf(inUvTransform, uvTransform.length);
     this.uvTransform = mat4.clone(inUvTransform);
-
-    // ASSUMING THAT INTRANSFORM WOULD BE THE MODELVIEW MATRIX
-    // const fieldOfView = (45 * Math.PI) / 180;
-    // const aspect =
-    //   (gl.canvas as HTMLElement).offsetWidth /
-    //   (gl.canvas as HTMLElement).offsetHeight;
-    // const zNear = 0.1;
-    // const zFar = 100.0;
-
-    // mat4.perspective(this.uvTransform, fieldOfView, aspect, zNear, zFar);
-    // mat4.translate(inTransform, inTransform, [0.0, 0.0, -1.0]);
-
-    // mat4.perspective(inTransform, fieldOfView, aspect, zNear, zFar);
-    // mat4.translate(this.uvTransform, this.uvTransform, [0.0, 0.0, -1.0]);
 
     if (noScale) {
       console.log('%c NO SCALE', 'color: red');
@@ -163,13 +138,12 @@ export class TextureRenderer {
         (((top - bottom) / 2) * Renderer.getInstance().sScreenHeight) /
         texture.getHeight();
 
-      // Matrix.scaleM(uvTransform, 0, widthUvScale, heightUvScale, 1);
       const v3 = vec3.fromValues(widthUvScale, heightUvScale, 1);
       mat4.scale(this.uvTransform, this.uvTransform, v3);
     }
 
-    // mTexCoordBuffer.rewind();
-    // mPositionBuffer.rewind();
+    this.mTexCoordBuffer.rewind();
+    this.mPositionBuffer.rewind();
 
     this.mTextureMaterial.beginRender();
 
@@ -178,18 +152,20 @@ export class TextureRenderer {
     gl.bindTexture(gl.TEXTURE_2D, texture.getTextureId());
 
     // Set attribute arrays
-    // gl.bindBuffer(gl.ARRAY_BUFFER, this.mPositionBuffer);
     this.mTextureMaterial.setVertexAttributeBuffer(
       'aPosition',
-      this.mPositionBuffer,
+      this.mPositionBuffer.glBuffer,
       0,
-      positionData,
+    );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(this.mPositionBuffer.getRawBuffer()),
+      gl.STATIC_DRAW,
     );
 
-    // gl.bindBuffer(gl.ARRAY_BUFFER, this.mTexCoordBuffer);
     this.mTextureMaterial.setVertexAttributeBuffer(
       'aTexCoord',
-      this.mTexCoordBuffer,
+      this.mTexCoordBuffer.glBuffer,
       0,
     );
 
@@ -224,12 +200,18 @@ export class TextureRenderer {
     bottom: number,
     right: number,
     top: number,
-  ): number[] {
-    return [left, bottom, right, bottom, left, top, right, top];
-    // const gl: WebGL2RenderingContext = state.get(
-    //   'context',
-    // ) as WebGL2RenderingContext;
-    // gl.bindBuffer(gl.ARRAY_BUFFER, this.mPositionBuffer);
-    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+  ): void {
+    const data = new Float32Array([
+      left,
+      bottom,
+      right,
+      bottom,
+      left,
+      top,
+      right,
+      top,
+    ]);
+    this.mPositionBuffer.position(0);
+    this.mPositionBuffer.put(data);
   }
 }

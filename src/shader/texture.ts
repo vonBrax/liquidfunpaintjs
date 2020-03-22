@@ -86,11 +86,7 @@ export class Texture {
   // OpenGL standard has (0,0) as the lower left corner,
   // whereas Android Bitmaps use (0,0) as the upper left corner.
   // We flip images on load to get around this.
-  private static Y_FLIP_MATRIX: mat3 = createMatrix(1, -1); //  new Matrix().setScale(1, -1);
-  //   static {
-  //       Y_FLIP_MATRIX = new Matrix();
-  //       Y_FLIP_MATRIX.setScale(1, -1);
-  //   }
+  private static Y_FLIP_MATRIX: mat3 = createMatrix(1, -1);
 
   /**
    * Default constructor.
@@ -102,74 +98,33 @@ export class Texture {
    *
    * @param resourceId Resource ID of a drawable.
    */
-  //   public Texture(Context context, int resourceId) {
-  //     this(context, resourceId, true, WrapParam.DEFAULT, WrapParam.DEFAULT);
-  //   }
-  // constructor(context: Context, resourceId: number);
 
   /**
    * Constructor with more parameters for creating a texture.
    * @param resourceId Resource ID of a drawable.
    * @param scale If true, BitmapFactory will scale image. Else it won't.
    */
-  //   public Texture(
-  //           Context context, int resourceId, boolean scale,
-  //           WrapParam wrapS, WrapParam wrapT) {
-  //       mName = context.getResources().getResourceEntryName(resourceId);
-  //       generateTexture();
-  //       loadTexture(context, resourceId, scale, wrapS, wrapT);
-  //   }
-  // constructor(
-  //   context: Context,
-  //   resourceId: number,
-  //   scale: boolean,
-  //   wrapS: WrapParam,
-  //   wrapT: WrapParam,
-  // );
 
   /**
    * Load a texture in the assets directory
    * @param assetName
    */
-  //   public Texture(Context context, String assetName) {
-  //       this(context, assetName, true, WrapParam.DEFAULT, WrapParam.DEFAULT);
-  //   }
-  // constructor(context: Context, assetName: string);
 
   /**
    * Load a texture in the assets directory
    * @param assetName
    */
-  //   public Texture(Context context, String assetName, boolean scale,
-  //           WrapParam wrapS, WrapParam wrapT) {
-  //       mName = assetName;
-  //       generateTexture();
-  //       Bitmap bitmap = FileHelper.loadBitmap(context.getAssets(), assetName);
-  //       loadTexture(bitmap, scale, wrapS, wrapT);
-  //       bitmap.recycle();
-  //   }
-  // constructor(
-  //   context: Context,
-  //   assetName: string,
-  //   scale: boolean,
-  //   wrapS: WrapParam,
-  //   wrapT: WrapParam,
-  // );
 
   /**
    * Constructor for textures not loaded from resource.
    * Notably texture use for render surfaces.
    */
-  //   public Texture() {
-  //       generateTexture();
-  //   }
-  // constructor();
 
   constructor(textureConstructor?: TextureConstructor) {
     if (!textureConstructor) {
       this.generateTexture();
     } else {
-      const { /* context, */ resourceId, assetName } = textureConstructor;
+      const { resourceId, assetName } = textureConstructor;
       let { scale, wrapS, wrapT } = textureConstructor;
 
       scale = scale || true;

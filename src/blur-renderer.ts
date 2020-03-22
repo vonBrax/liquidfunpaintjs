@@ -84,12 +84,12 @@ export class BlurRenderer {
     // Set the attribute arrays
     this.mXBlurMaterial.setVertexAttributeBuffer(
       'aPosition',
-      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER,
+      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER.glBuffer,
       0 * 4,
     );
     this.mXBlurMaterial.setVertexAttributeBuffer(
       'aTexCoord',
-      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER,
+      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER.glBuffer,
       3 * 4,
     );
 
@@ -126,12 +126,12 @@ export class BlurRenderer {
     // Set attribute arrays
     this.mYBlurMaterial.setVertexAttributeBuffer(
       'aPosition',
-      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER,
+      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER.glBuffer,
       0 * 4,
     );
     this.mYBlurMaterial.setVertexAttributeBuffer(
       'aTexCoord',
-      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER,
+      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER.glBuffer,
       3 * 4,
     );
 

@@ -14,69 +14,14 @@ import { JSONObject } from './util/types';
 import { Log } from './util/functionsHelper';
 import { FileHelper } from './util/file-helper';
 import { BlurRenderer } from './blur-renderer';
-import {
-  createBuffer,
-  destroyBuffer,
-  ParticleBuffer,
-  ArrayViewType,
-} from './util/wasm-buffer';
+// import {
+//   createBuffer,
+//   destroyBuffer,
+//   ParticleBuffer,
+//   ArrayViewType,
+// } from './util/wasm-buffer';
 import { Tool, ToolType } from './tool/tool';
-
-// declare type TypedArray =
-//   | Int8Array
-//   | Uint8Array
-//   | Uint8ClampedArray
-//   | Int16Array
-//   | Uint16Array
-//   | Int32Array
-//   | Uint32Array
-//   | Float32Array
-//   | Float64Array
-//   | BigInt64Array
-//   | BigUint64Array;
-
-// function _arrayToHeap(typedArray: TypedArray): TypedArray {
-//   const numBytes = typedArray.length * typedArray.BYTES_PER_ELEMENT;
-//   const ptr = Module._malloc(numBytes);
-//   const heapBytes = new Uint8Array(Module.HEAPU8.buffer, ptr, numBytes);
-//   heapBytes.set(new Uint8Array(typedArray.buffer));
-//
-//   return heapBytes;
-// }
-
-// function _freeArray(heapBytes: TypedArray): void {
-//   Module._free(heapBytes.byteOffset);
-// }
-
-// interface ParticleBuffer {
-//   bufferData: TypedArray;
-//   pointer: number;
-//   buffer: WebGLBuffer;
-// }
-
-// function createBuffer(num = 1): ParticleBuffer {
-//   const numBytes = num * 4 * Renderer.MAX_PARTICLE_COUNT;
-//   const dataPtr = Module._malloc(numBytes);
-
-//   const gl: WebGLRenderingContext = state.get('context');
-
-//   // const bufferData =
-//   //   type === 'Uint8'
-//   //     ? new Uint8Array(Module.HEAPU8.buffer, dataPtr, numBytes)
-//   //     : new Float32Array(Module.HEAPU8.buffer, dataPtr, numBytes);
-
-//   return {
-//     pointer: dataPtr,
-//     bufferData: new Float32Array(Module.HEAPU8.buffer, dataPtr, numBytes),
-//     // bufferData,
-//     buffer: gl.createBuffer(),
-//   };
-//   // return new Uint8Array(Module.HEAPU8.buffer, dataPtr, numBytes);
-// }
-
-// function destroyBuffer(ptr: number): void {
-//   Module._free(ptr);
-// }
+import { ByteBuffer } from './util/byte-buffer';
 
 /**
  * Renderer to draw particle water, objects, and wall. It draws particles as
@@ -106,54 +51,36 @@ export class ParticleRenderer {
   private mTransformFromTexture: mat4 = mat4.create(); // = Array(16);
   private mTransformFromWorld: mat4 = mat4.create();
 
-  private mParticleColorBuffer: ParticleBuffer;
-  private mParticlePositionBuffer: ParticleBuffer;
-  private mParticleWeightBuffer: ParticleBuffer;
+  // private mParticleColorBuffer: ParticleBuffer;
+  private mParticleColorBuffer: ByteBuffer;
+  private mParticlePositionBuffer: ByteBuffer;
+  private mParticleWeightBuffer: ByteBuffer;
 
   private mParticleRenderList: ParticleGroup[] = Array(256);
 
   constructor() {
-    // const gl: WebGL2RenderingContext = state.get(
-    //   'context',
-    // ) as WebGL2RenderingContext;
-    // this.mParticlePositionBuffer = gl.createBuffer();
-    // this.mParticleColorBuffer = gl.createBuffer();
-    // this.mParticleWeightBuffer = gl.createBuffer();
-    this.mParticlePositionBuffer = createBuffer(
+    this.mParticlePositionBuffer = new ByteBuffer(
       2 * 4 * Renderer.MAX_PARTICLE_COUNT,
-      true,
-      ArrayViewType.FLOAT32,
     );
-    // gl.bindBuffer(gl.ARRAY_BUFFER, this.mParticlePositionBuffer.buffer);
-    // gl.bufferData(
-    //   gl.ARRAY_BUFFER,
-    //   this.mParticlePositionBuffer.bufferData,
-    //   gl.STATIC_DRAW,
-    // );
+    this.mParticlePositionBuffer.createGLBuffer();
+    this.mParticlePositionBuffer.createEmbindBuffer();
 
-    this.mParticleColorBuffer = createBuffer(
-      1 * 4 * Renderer.MAX_PARTICLE_COUNT,
-      true,
-      ArrayViewType.UINT8,
-    );
-    // gl.bindBuffer(gl.ARRAY_BUFFER, this.mParticleColorBuffer.buffer);
-    // gl.bufferData(
-    //   gl.ARRAY_BUFFER,
-    //   this.mParticleColorBuffer.bufferData,
-    //   gl.STATIC_DRAW,
+    // this.mParticleColorBuffer = createBuffer(
+    //   1 * 4 * Renderer.MAX_PARTICLE_COUNT,
+    //   true,
+    //   ArrayViewType.UINT8,
     // );
+    this.mParticleColorBuffer = new ByteBuffer(
+      1 * 4 * Renderer.MAX_PARTICLE_COUNT,
+    );
+    this.mParticleColorBuffer.createGLBuffer();
+    this.mParticleColorBuffer.createEmbindBuffer();
 
-    this.mParticleWeightBuffer = createBuffer(
+    this.mParticleWeightBuffer = new ByteBuffer(
       1 * 4 * Renderer.MAX_PARTICLE_COUNT,
-      true,
-      ArrayViewType.FLOAT32,
     );
-    // gl.bindBuffer(gl.ARRAY_BUFFER, this.mParticleWeightBuffer.buffer);
-    // gl.bufferData(
-    //   gl.ARRAY_BUFFER,
-    //   this.mParticleWeightBuffer.bufferData,
-    //   gl.STATIC_DRAW,
-    // );
+    this.mParticleWeightBuffer.createGLBuffer();
+    this.mParticleWeightBuffer.createEmbindBuffer();
   }
 
   /**
@@ -168,75 +95,47 @@ export class ParticleRenderer {
    */
   public draw(): void {
     // Per frame resets of buffers
-    // mParticlePositionBuffer.rewind();
-    // mParticleColorBuffer.rewind();
-    // mParticleWeightBuffer.rewind();
+    this.mParticlePositionBuffer.rewind();
+    this.mParticleColorBuffer.rewind();
+    this.mParticleWeightBuffer.rewind();
     this.mParticleRenderList = [];
 
     const ps: ParticleSystem = Renderer.getInstance().acquireParticleSystem();
-    //const buffer = new ArrayBuffer(8);
-    //const view = new Int8Array(buffer);
 
     try {
       const gl: WebGL2RenderingContext = state.get(
         'context',
       ) as WebGL2RenderingContext;
-      // const size = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
 
       const worldParticleCount = ps.GetParticleCount();
-      // console.log(worldParticleCount);
 
-      // grab the most current particle buffers
+      // Grab the most current particle buffers
       ps.CopyPositionBuffer(
-        // ps,
         0,
         worldParticleCount,
-        this.mParticlePositionBuffer.pointer,
-        //view,
-        2 * 4 * Renderer.MAX_PARTICLE_COUNT,
+        this.mParticlePositionBuffer.getPointer(),
+        this.mParticlePositionBuffer.getLimit(),
       );
+
       ps.CopyColorBuffer(
         0,
         worldParticleCount,
-        this.mParticleColorBuffer.pointer,
-        1 * 4 * Renderer.MAX_PARTICLE_COUNT,
+        this.mParticleColorBuffer.getPointer(),
+        this.mParticleColorBuffer.getLimit(),
       );
+
       ps.CopyWeightBuffer(
         0,
         worldParticleCount,
-        this.mParticleWeightBuffer.pointer,
-        1 * 4 * Renderer.MAX_PARTICLE_COUNT,
+        this.mParticleWeightBuffer.getPointer(),
+        this.mParticleWeightBuffer.getLimit(),
       );
-
-      // gl.bindBuffer(gl.ARRAY_BUFFER, this.mParticlePositionBuffer.buffer);
-      // gl.bufferData(
-      //   gl.ARRAY_BUFFER,
-      //   this.mParticlePositionBuffer.bufferData,
-      //   gl.DYNAMIC_DRAW,
-      // );
-
-      // gl.bindBuffer(gl.ARRAY_BUFFER, this.mParticleColorBuffer.buffer);
-      // gl.bufferData(
-      //   gl.ARRAY_BUFFER,
-      //   this.mParticleColorBuffer.bufferData,
-      //   gl.STATIC_DRAW,
-      // );
-
-      // gl.bindBuffer(gl.ARRAY_BUFFER, this.mParticleWeightBuffer.buffer);
-      // gl.bufferData(
-      //   gl.ARRAY_BUFFER,
-      //   this.mParticleWeightBuffer.bufferData,
-      //   gl.STATIC_DRAW,
-      // );
 
       gl.clearColor(0, 0, 0, 0);
 
       // Draw the particles
       this.drawParticles();
 
-      // gl.bindFramebuffer(gl.FRAMEBUFFER, 0);
-      // gl.bindFramebuffer(gl.FRAMEBUFFER, state.get('frameBuffers')[0]);
-      // gl.bindFramebuffer(gl.FRAMEBUFFER, this.mRenderSurface[0].getBuffer());
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
       gl.viewport(
@@ -280,13 +179,6 @@ export class ParticleRenderer {
     // Get the buffer offsets
     const instanceOffset = pg.GetBufferIndex();
     const particleCount = pg.GetParticleCount();
-    // console.log(instanceOffset);
-    // if (particleCount === 5) {
-    //   console.log('%c WE GOT IT', 'color: green');
-    //   console.log(this.mParticlePositionBuffer.bufferData.slice(0, 30));
-    //   // console.log(this.mParticleColorBuffer.bufferData);
-    //   // console.log(this.mParticleWeightBuffer.bufferData);
-    // }
 
     const gl: WebGL2RenderingContext = state.get(
       'context',
@@ -312,22 +204,47 @@ export class ParticleRenderer {
     // Set attribute arrays
     this.mWaterParticleMaterial.setVertexAttributeBuffer(
       'aPosition',
-      this.mParticlePositionBuffer.buffer,
+      this.mParticlePositionBuffer.glBuffer,
       0,
-      this.mParticlePositionBuffer.bufferData,
     );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(
+        Module.HEAPU8.buffer,
+        this.mParticlePositionBuffer.getPointer(),
+        this.mParticlePositionBuffer.getLimit(),
+      ),
+      gl.DYNAMIC_DRAW,
+    );
+
     this.mWaterParticleMaterial.setVertexAttributeBuffer(
       'aColor',
-      this.mParticleColorBuffer.buffer,
+      this.mParticleColorBuffer.glBuffer,
       0,
-      this.mParticleColorBuffer.bufferData,
-      true,
     );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Uint8Array(
+        Module.HEAPU8.buffer,
+        this.mParticleColorBuffer.getPointer(),
+        this.mParticleColorBuffer.getLimit(),
+      ),
+      gl.DYNAMIC_DRAW,
+    );
+
     this.mWaterParticleMaterial.setVertexAttributeBuffer(
       'aWeight',
-      this.mParticleWeightBuffer.buffer,
+      this.mParticleWeightBuffer.glBuffer,
       0,
-      this.mParticleWeightBuffer.bufferData,
+    );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(
+        Module.HEAPU8.buffer,
+        this.mParticleWeightBuffer.getPointer(),
+        this.mParticleWeightBuffer.getLimit(),
+      ),
+      gl.DYNAMIC_DRAW,
     );
 
     // Set uniforms
@@ -386,13 +303,32 @@ export class ParticleRenderer {
     // Set attribute arrays
     this.mParticleMaterial.setVertexAttributeBuffer(
       'aPosition',
-      this.mParticlePositionBuffer.buffer,
+      this.mParticlePositionBuffer.glBuffer,
       0,
     );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(
+        Module.HEAPU8.buffer,
+        this.mParticlePositionBuffer.getPointer(),
+        this.mParticlePositionBuffer.getLimit(),
+      ),
+      gl.DYNAMIC_DRAW,
+    );
+
     this.mParticleMaterial.setVertexAttributeBuffer(
       'aColor',
-      this.mParticleColorBuffer.buffer,
+      this.mParticleColorBuffer.glBuffer,
       0,
+    );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Uint8Array(
+        Module.HEAPU8.buffer,
+        this.mParticleColorBuffer.getPointer(),
+        this.mParticleColorBuffer.getLimit(),
+      ),
+      gl.DYNAMIC_DRAW,
     );
 
     // Set uniforms
@@ -438,8 +374,6 @@ export class ParticleRenderer {
       this.mTransformFromTexture,
       vec3.fromValues(1 / xRatio, 1 / yRatio, 1),
     );
-    // Matrix.setIdentityM(mTransformFromTexture, 0);
-    // Matrix.scaleM(mTransformFromTexture, 0, 1, 1 / ratio, 1);
 
     mat4.fromTranslation(
       this.mTransformFromWorld,
@@ -454,14 +388,6 @@ export class ParticleRenderer {
         1,
       ),
     );
-    // Matrix.setIdentityM(mTransformFromWorld, 0);
-    // Matrix.translateM(mTransformFromWorld, 0, -1, -ratio, 0);
-    // Matrix.scaleM(
-    //         mTransformFromWorld,
-    //         0,
-    //         2f / Renderer.getInstance().sRenderWorldWidth,
-    //         2 * ratio / Renderer.getInstance().sRenderWorldHeight,
-    //         1);
   }
 
   public async onSurfaceCreated(/* context: Context */): Promise<void> {
@@ -472,12 +398,6 @@ export class ParticleRenderer {
         ParticleRenderer.FB_SIZE,
       );
       this.mRenderSurface[i].setClearColor(AndroidColor.argb(0, 255, 255, 255));
-      // this.mRenderSurface[i].setClearColor(
-      //   255 / 255,
-      //   255 / 255,
-      //   255 / 255,
-      //   0 / 255,
-      // );
     }
 
     // Create the blur renderer
@@ -485,7 +405,6 @@ export class ParticleRenderer {
 
     // Read in our specific json file
     const materialFile: string = await FileHelper.loadAsset(
-      // context.getAssets(),
       ParticleRenderer.JSON_FILE,
     );
     try {
@@ -494,7 +413,6 @@ export class ParticleRenderer {
       // Water particle material. We are utilizing the position and color
       // buffers returned from LiquidFun directly.
       this.mWaterParticleMaterial = new WaterParticleMaterial(
-        // context,
         json.waterParticlePointSprite as JSONObject,
       );
 
@@ -559,14 +477,12 @@ export class ParticleRenderer {
 
       // Scrolling texture when we copy water particles from FBO to screen
       this.mWaterScreenRenderer = new ScreenRenderer(
-        // context,
         json.waterParticleToScreen as JSONObject,
         this.mRenderSurface[0].getTexture(),
       );
 
       // Scrolling texture when we copy water particles from FBO to screen
       this.mScreenRenderer = new ScreenRenderer(
-        // context,
         json.otherParticleToScreen as JSONObject,
         this.mRenderSurface[1].getTexture(),
       );
@@ -575,13 +491,12 @@ export class ParticleRenderer {
       const materialData: JSONObject = json[
         ParticleRenderer.PAPER_MATERIAL_NAME
       ] as JSONObject;
+
       const textureName = materialData[
         ParticleRenderer.DIFFUSE_TEXTURE_NAME
       ] as string;
-      this.mPaperTexture = new Texture(
-        // context,
-        { assetName: textureName },
-      );
+
+      this.mPaperTexture = new Texture({ assetName: textureName });
     } catch (ex) {
       Log.e(
         ParticleRenderer.TAG,
@@ -597,5 +512,6 @@ export class ParticleRenderer {
     // this.mParticlePositionBuffer = gl.createBuffer();
     // this.mParticleColorBuffer = gl.createBuffer();
     // this.mParticleWeightBuffer = gl.createBuffer();
+    this.mParticleColorBuffer.clear();
   }
 }

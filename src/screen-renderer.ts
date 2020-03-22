@@ -15,7 +15,7 @@ export class ScreenRenderer {
   private mMaterial: Material;
   private mAlphaThreshold: number;
 
-  constructor(/* context: Context, */ json: JSONObject, fboTexture: Texture) {
+  constructor(json: JSONObject, fboTexture: Texture) {
     this.mMaterial = new Material(
       new ShaderProgram('texture.glslv', 'screen.glslf'),
     );
@@ -27,7 +27,6 @@ export class ScreenRenderer {
       4,
       false,
       RenderHelper.SCREEN_QUAD_VERTEX_STRIDE,
-      // 2 * 4,
     );
     this.mMaterial.addAttribute(
       'aTexCoord',
@@ -36,7 +35,6 @@ export class ScreenRenderer {
       4,
       false,
       RenderHelper.SCREEN_QUAD_VERTEX_STRIDE,
-      // 3 * 4,
     );
 
     // Add the diffuse texture: particle FBO
@@ -64,15 +62,13 @@ export class ScreenRenderer {
     // Set attribute arrays
     this.mMaterial.setVertexAttributeBuffer(
       'aPosition',
-      // RenderHelper.SCREEN_QUAD_VERTEX_BUFFER,
-      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER,
+      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER.glBuffer,
       0 * 4, // offset * item size (float32 = 4 bytes)
     );
 
     this.mMaterial.setVertexAttributeBuffer(
       'aTexCoord',
-      // RenderHelper.SCREEN_QUAD_VERTEX_BUFFER,
-      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER,
+      RenderHelper.SCREEN_QUAD_VERTEX_BUFFER.glBuffer,
       3 * 4, // offset * item size (float32 = 4 bytes)
     );
 

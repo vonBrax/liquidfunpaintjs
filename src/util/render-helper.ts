@@ -1,4 +1,5 @@
 import { state } from '../state';
+import { ByteBuffer } from './byte-buffer';
 
 function createBuffer(data: number[]): WebGLBuffer {
   const gl: WebGL2RenderingContext = state.get(
@@ -8,6 +9,22 @@ function createBuffer(data: number[]): WebGLBuffer {
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  return buffer;
+}
+
+function createByteBuffer(size: number, data?: number[]): ByteBuffer {
+  const buffer = new ByteBuffer(size);
+  buffer.nativeOrder();
+  buffer.createGLBuffer();
+  if (data) {
+    const gl = state.get('context') as WebGLRenderingContext;
+    const typedArray = new Float32Array(data);
+    buffer.put(typedArray);
+    buffer.position(0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer.glBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, typedArray, gl.STATIC_DRAW);
+  }
+
   return buffer;
 }
 
@@ -40,7 +57,12 @@ export class RenderHelper {
   // public static SCREEN_QUAD_VERTEX_BUFFER(): WebGLBuffer {
   //   return createBuffer(RenderHelper.SCREEN_QUAD_VERTEX_DATA);
   // }
-  public static SCREEN_QUAD_VERTEX_BUFFER: WebGLBuffer = createBuffer(
+  // public static SCREEN_QUAD_VERTEX_BUFFER: WebGLBuffer = createBuffer(
+  //   RenderHelper.SCREEN_QUAD_VERTEX_DATA,
+  // );
+
+  public static SCREEN_QUAD_VERTEX_BUFFER: ByteBuffer = createByteBuffer(
+    RenderHelper.SCREEN_QUAD_VERTEX_DATA.length * 4,
     RenderHelper.SCREEN_QUAD_VERTEX_DATA,
   );
 }
