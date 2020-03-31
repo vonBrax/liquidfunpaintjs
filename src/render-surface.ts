@@ -38,13 +38,11 @@ export class RenderSurface {
     this.mWidth = width;
     this.mHeight = height;
 
-    const gl: WebGL2RenderingContext = state.get(
+    const gl: WebGLRenderingContext = state.get(
       'context',
-    ) as WebGL2RenderingContext;
+    ) as WebGLRenderingContext;
+
     this.mFrameBuffer = gl.createFramebuffer();
-    // const buffers = state.get('frameBuffers') || [];
-    // buffers.push(this.mFrameBuffer);
-    // state.set('frameBuffers', buffers);
     this.mTexture = new Texture();
 
     // Bind the texture object
@@ -85,16 +83,16 @@ export class RenderSurface {
     }
 
     // Bind the screen frame buffer
-    // gl.bindFramebuffer(gl.FRAMEBUFFER, state.get('frameBuffers')[0]);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
 
   public beginRender(clearMask: number): void {
-    const gl: WebGL2RenderingContext = state.get(
+    const gl: WebGLRenderingContext = state.get(
       'context',
-    ) as WebGL2RenderingContext;
+    ) as WebGLRenderingContext;
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.mFrameBuffer);
     gl.viewport(0, 0, this.mWidth, this.mHeight);
+
     if (clearMask !== 0) {
       gl.clearColor(
         AndroidColor.red(this.mClearColor),

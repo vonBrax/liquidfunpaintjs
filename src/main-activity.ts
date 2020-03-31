@@ -13,6 +13,7 @@ export class MainActivity {
   private mController: Controller;
   private mWorldView: HTMLCanvasElement;
   private mUsingTool: boolean;
+  private mSelected: ToolType;
 
   constructor(canvas: HTMLCanvasElement) {
     this.mWorldView = canvas;
@@ -29,6 +30,7 @@ export class MainActivity {
     ) as WebGLRenderingContext;
     await renderer.onSurfaceCreated(/* gl */);
     // renderer.onSurfaceChanged(gl, window.innerWidth, window.innerHeight);
+    // const bounds = (gl.canvas as HTMLCanvasElement).getBoundingClientRect();
     renderer.onSurfaceChanged(
       gl,
       Math.floor(
@@ -38,6 +40,11 @@ export class MainActivity {
         (gl.canvas as HTMLCanvasElement).clientHeight * window.devicePixelRatio,
       ),
     );
+    // renderer.onSurfaceChanged(
+    //   gl,
+    //   Math.floor(Math.round(bounds.width * window.devicePixelRatio)),
+    //   Math.floor(bounds.height * window.devicePixelRatio),
+    // );
     this.motionEvent = new MotionEvent(this.mWorldView);
     this.mController = new Controller();
 
@@ -66,27 +73,55 @@ export class MainActivity {
 
     // renderer.onSurfaceCreated(gl);
     // renderer.startSimulation();
-
-    window.addEventListener('resize', () =>
-      // renderer.onSurfaceChanged(gl, window.innerWidth, window.innerHeight),
-      renderer.onSurfaceChanged(
-        gl,
-        Math.floor(
-          (gl.canvas as HTMLCanvasElement).clientWidth *
-            window.devicePixelRatio,
+    window.addEventListener(
+      'resize',
+      () =>
+        // renderer.onSurfaceChanged(gl, window.innerWidth, window.innerHeight),
+        renderer.onSurfaceChanged(
+          gl,
+          Math.floor(
+            (gl.canvas as HTMLCanvasElement).clientWidth *
+              window.devicePixelRatio,
+          ),
+          Math.floor(
+            (gl.canvas as HTMLCanvasElement).clientHeight *
+              window.devicePixelRatio,
+          ),
         ),
-        Math.floor(
-          (gl.canvas as HTMLCanvasElement).clientHeight *
-            window.devicePixelRatio,
-        ),
-      ),
+      // renderer.onSurfaceChanged(
+      //   gl,
+      //   Math.floor(Math.round(bounds.width * window.devicePixelRatio)),
+      //   Math.floor(bounds.height * window.devicePixelRatio),
+      // ),
     );
     // canvas.addEventListener('mousedown', this.onTouchCanvas)
     // canvas.addEventListener('touchstart', this.onTouchCanvas)
     // canvas.addEventListener('pointerdown', this.onTouchCanvas)
+    document.getElementById('play').addEventListener('click', () => {
+      Renderer.getInstance().startSimulation();
+    });
+    document.getElementById('pause').addEventListener('click', () => {
+      Renderer.getInstance().pauseSimulation();
+    });
     document.getElementById('reset').addEventListener('click', () => {
       Renderer.getInstance().reset();
       this.mController.reset();
+    });
+
+    document.getElementById('info').addEventListener('change', evt => {
+      const target = evt.target as HTMLInputElement;
+      switch (target.value) {
+        case 'stats':
+          state.set('stats', target.checked);
+          break;
+        case 'debug':
+          // state.set('debug', target.checked);
+          Renderer.DEBUG_DRAW = target.checked;
+          break;
+        case 'blur':
+          state.set('blur', target.checked);
+          break;
+      }
     });
 
     document.getElementById('tools').addEventListener('change', evt => {
@@ -116,8 +151,8 @@ export class MainActivity {
         this.getColor(parseInt((evt.target as HTMLInputElement).value, 16)),
       );
     });
+
     renderer.onDrawFrame();
-    // window.requestAnimationFrame(() => renderer.onDrawFrame(gl));
   }
 
   getColor(color: number): number {
@@ -129,6 +164,7 @@ export class MainActivity {
 
   private select(tool: ToolType): void {
     // Send the new tool over to the Controller
+    this.mSelected = tool;
     this.mController.setTool(tool);
   }
 
@@ -147,15 +183,20 @@ export class MainActivity {
    */
   onTouchCanvas(event: MotionEvent): boolean {
     // this.mController.onTouch(event);
-    console.log(event.getActionMasked());
     switch (event.getActionMasked()) {
       case MotionEvent.ACTION_DOWN:
         this.mUsingTool = true;
+        if (this.mSelected === ToolType.RIGID) {
+          Renderer.getInstance().pauseSimulation();
+        }
         break;
 
       case MotionEvent.ACTION_CANCEL:
       case MotionEvent.ACTION_UP:
         this.mUsingTool = false;
+        if (this.mSelected === ToolType.RIGID) {
+          Renderer.getInstance().startSimulation();
+        }
         break;
       default:
         break;

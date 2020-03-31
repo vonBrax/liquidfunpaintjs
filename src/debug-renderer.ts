@@ -3,9 +3,7 @@ import { ShaderProgram } from './shader/shader-program';
 import { Material, AttributeInfo } from './shader/material';
 import { Texture } from './shader/texture';
 import { Renderer } from './renderer';
-// import { Color } from './util/types';
 import { state } from './state';
-// import { Module } from './util/types';
 import { ByteBuffer } from './util/byte-buffer';
 import { TypedArray } from './util/wasm-buffer';
 
@@ -82,6 +80,9 @@ export class DebugRenderer {
     // // @ts-ignore
     // this.b2Draw = newDraw;
     // console.log(newDraw);
+
+    // Make sure we set the right context when
+    // function is called from c++
     this.bindMethods();
 
     // this.mPolygonPositionBuffer = gl.createBuffer();
@@ -146,20 +147,10 @@ export class DebugRenderer {
     g: number,
     b: number,
   ): void {
-    // const data = [r, g, b, DebugRenderer.DEBUG_OPACITY];
-    // const gl: WebGL2RenderingContext = state.get(
-    //   'context',
-    // ) as WebGL2RenderingContext;
-    // gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW);
     buffer.put(r * 255);
     buffer.put(g * 255);
     buffer.put(b * 255);
     buffer.put(DebugRenderer.DEBUG_OPACITY * 255);
-    if (!r) {
-      console.log('FUCK!');
-      console.log(r);
-    }
   }
 
   private addColorToBuffer(buffer: ByteBuffer, color: Color): void {
@@ -181,15 +172,8 @@ export class DebugRenderer {
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       const ptr = vertices.$$.ptr;
-      // const view = new Float32Array(Module.HEAPU8.buffer, ptr, vertexCount);
-      // const view = getValue(ptr)
       const temp = [];
       for (let i = 0; i < vertexCount; i++) {
-        // Hopefully we will get the pointer that points to
-        // the vec2 object
-        // const vec: Vec2 = (getValue(ptr + i * 4, 'i32') as unknown) as Vec2;
-        // temp.push(vec.x);
-        // temp.push(vec.y);
         temp.push(getValue(ptr + i * 4 + i * 4, 'float'));
         temp.push(getValue(ptr + i * 4 + (i * 4 + 4), 'float'));
       }
@@ -251,7 +235,6 @@ export class DebugRenderer {
 
   // @Override
   public DrawSolidPolygon(
-    // vertices: number[],
     vertices: Vec2[] | number | TypedArray,
     vertexCount: number,
     color: Color,
@@ -263,11 +246,6 @@ export class DebugRenderer {
       const ptr = vertices.$$.ptr;
       const temp = [];
       for (let i = 0; i < vertexCount; i++) {
-        // Hopefully we will get the pointer that points to
-        // the vec2 object
-        // const vec: Vec2 = (getValue(ptr + i * 4, 'i32') as unknown) as Vec2;
-        // temp.push(vec.x);
-        // temp.push(vec.y);
         temp.push(getValue(ptr + i * 4 + i * 4, 'float'));
         temp.push(getValue(ptr + i * 4 + (i * 4 + 4), 'float'));
       }
@@ -322,10 +300,8 @@ export class DebugRenderer {
 
   // @Override
   public DrawCircle(center: Vec2, radius: number, color: Color): void {
-    console.log('draw circle');
     this.mCirclePositionBuffer.putFloat(center.x);
     this.mCirclePositionBuffer.putFloat(center.y);
-    console.log(center.x, center.y);
 
     const addColorToBuffer =
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
@@ -350,7 +326,6 @@ export class DebugRenderer {
     axis: Vec2,
     color: Color,
   ): void {
-    console.log('Draw solid circle');
     this.DrawCircle(center, radius, color);
 
     // Draw the axis line
@@ -358,9 +333,7 @@ export class DebugRenderer {
     const centerY = center.y;
     this.addSegmentPoint(centerX, centerY, color.r, color.g, color.b);
     this.addSegmentPoint(
-      // centerX + radius * axis[0],
       centerX + radius * axis.x,
-      // centerY + radius * axis[1],
       centerY + radius * axis.y,
       color.r,
       color.g,
@@ -375,7 +348,7 @@ export class DebugRenderer {
     colors: ParticleColor[] | number | TypedArray,
     count: number,
   ): void {
-    if (!Array.isArray(centers) && !Array.isArray(colors)) {
+    if (!Array.isArray(centers) || !Array.isArray(colors)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       const ptr = centers.$$.ptr;
@@ -383,42 +356,26 @@ export class DebugRenderer {
       // @ts-ignore
       const ptrColors = colors.$$.ptr;
       const temp = [];
-      const tempColors = [];
+      const tempColors = new Float32Array(count);
 
       for (let i = 0; i < count; i++) {
-        // Hopefully we will get the pointer that points to
-        // the vec2 object
-        // const vec: Vec2 = (getValue(ptr + i * 4, 'float') as unknown) as Vec2;
         temp.push(getValue(ptr + i * 4 + i * 4, 'float'));
         temp.push(getValue(ptr + i * 4 + (i * 4 + 4), 'float'));
-
-        // console.log(vec);
-        // temp.push(vec.x);
-        // temp.push(vec.y);
-        tempColors.push(getValue(ptrColors + i, 'i8'));
+        tempColors.set([getValue(ptrColors + i * 4, 'i32')], i);
       }
       centers = new Float32Array(temp);
-      colors = new Uint8Array(tempColors);
+      colors = new Uint8Array(tempColors.buffer);
     }
-    // const _centers: ArrayBufferView = centers as ArrayBufferView;
-    // const _colors: ArrayBufferView = colors as ArrayBufferView;
 
-    // console.log('%c ==== BEFORE ==== ', 'color: blue');
-    // console.log(centers);
     // Draw them as circles
     this.mCirclePositionBuffer.put(centers as Float32Array);
     this.mCircleColorBuffer.put(colors as Uint8Array);
-
-    // console.log('%c ==== AFTER ==== ', 'color: green');
-    // console.log(new Float32Array(this.mCirclePositionBuffer.getRawBuffer()));
 
     const pointSize = Math.max(
       1.0,
       Renderer.getInstance().sScreenWidth *
         ((2.0 * radius) / Renderer.getInstance().sRenderWorldWidth),
     );
-    // console.log(Renderer.getInstance().sScreenWidth);
-    // console.log(Renderer.getInstance().sRenderWorldWidth);
 
     for (let i = 0; i < count; ++i) {
       this.mCirclePointSizeBuffer.putFloat(pointSize);
@@ -448,7 +405,6 @@ export class DebugRenderer {
 
   // @Override
   public DrawTransform(xf: Transform): void {
-    // const posX = xf.getPositionX();
     const posX = xf.p.x;
     const posY = xf.GetPositionY();
 
@@ -488,10 +444,6 @@ export class DebugRenderer {
         'context',
       ) as WebGL2RenderingContext;
 
-      // const buffers = state.get('frameBuffers');
-      // if (buffers) {
-      //   gl.bindFramebuffer(gl.FRAMEBUFFER, buffers[0]);
-      // }
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       gl.viewport(
         0,
@@ -513,31 +465,37 @@ export class DebugRenderer {
     const gl: WebGL2RenderingContext = state.get(
       'context',
     ) as WebGL2RenderingContext;
-    /**
-     * @todo:
-     * The following functions calculate the number of elements
-     * based on the current buffer position and then dividing
-     * by the size of the element * 4. Ex: if buffer is in position
-     * 16 and each element has 2 bytes, then the element count is
-     * 16 / (2 * 4) = 2.
-     * Our implementation here is incorrect (it reads the size of the
-     * whole buffer in bytes instead).
-     */
-    // const numElements: number =
-    //   gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE) / (4 * 2);
+
     const numElements = this.mPolygonPositionBuffer.position() / (4 * 2);
 
     this.mPolygonMaterial.setVertexAttributeBuffer(
       this.mPolygonPositionAttr,
       this.mPolygonPositionBuffer.glBuffer,
       0,
-      new Float32Array(this.mPolygonPositionBuffer.getRawBuffer()),
     );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(
+        this.mPolygonPositionBuffer
+          .getRawBuffer()
+          .slice(0, this.mPolygonPositionBuffer.getSize()),
+      ),
+      gl.DYNAMIC_DRAW,
+    );
+
     this.mPolygonMaterial.setVertexAttributeBuffer(
       this.mPolygonColorAttr,
       this.mPolygonColorBuffer.glBuffer,
       0,
-      new Uint8Array(this.mPolygonColorBuffer.getRawBuffer()),
+    );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Uint8Array(
+        this.mPolygonColorBuffer
+          .getRawBuffer()
+          .slice(0, this.mPolygonColorBuffer.getSize()),
+      ),
+      gl.DYNAMIC_DRAW,
     );
 
     // Set uniforms
@@ -560,59 +518,54 @@ export class DebugRenderer {
     ) as WebGL2RenderingContext;
 
     gl.enable(gl.BLEND);
+    // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     const numElements = this.mCirclePointSizeBuffer.position() / 4;
-    const positionBuffer = new Float32Array(
-      this.mCirclePositionBuffer.getRawBuffer(),
-    );
-    // const colorBuffer = new Uint8Array(this.mCircleColorBuffer.getRawBuffer());
-    const pointSizeBuffer = new Float32Array(
-      this.mCirclePointSizeBuffer.getRawBuffer(),
-    );
-
-    // const msg = `
-    //   {
-    //     "position": [${positionBuffer[0]},${positionBuffer[1]},${positionBuffer[2]},${positionBuffer[3]},${positionBuffer[4]}],
-    //     "color": [${colorBuffer[0]},${colorBuffer[1]},${colorBuffer[2]},${colorBuffer[3]},${colorBuffer[4]}],
-    //     "pointSize": [${pointSizeBuffer[0]},${pointSizeBuffer[1]},${pointSizeBuffer[2]},${pointSizeBuffer[3]},${pointSizeBuffer[4]}]
-    //   }
-    // `;
-    // console.log(JSON.parse(msg));
-    // eslint-disable-next-line
-    // @ts-ignore
-    this.timeoutID =
-      // eslint-disable-next-line
-    // @ts-ignore
-      this.timeoutID ||
-      setTimeout(() => {
-        console.clear();
-        // eslint-disable-next-line
-    // @ts-ignore
-        this.timeoutID = null;
-      }, 30000);
 
     this.mCircleMaterial.setVertexAttributeBuffer(
       this.mCirclePositionAttr,
       this.mCirclePositionBuffer.glBuffer,
       0,
-      // new Float32Array(this.mCirclePositionBuffer.getRawBuffer()),
-      positionBuffer,
     );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(
+        this.mCirclePositionBuffer
+          .getRawBuffer()
+          .slice(0, this.mCirclePositionBuffer.getSize()),
+      ),
+      gl.DYNAMIC_DRAW,
+    );
+
     this.mCircleMaterial.setVertexAttributeBuffer(
       this.mCircleColorAttr,
       this.mCircleColorBuffer.glBuffer,
       0,
-      this.mCircleColorBuffer.getRawBuffer(),
-      true,
     );
-    // console.log(new Uint8Array(this.mCircleColorBuffer.getRawBuffer()))
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Uint8Array(
+        this.mCircleColorBuffer
+          .getRawBuffer()
+          .slice(0, this.mCircleColorBuffer.getSize()),
+      ),
+      gl.DYNAMIC_DRAW,
+    );
+
     this.mCircleMaterial.setVertexAttributeBuffer(
       this.mCirclePointSizeAttr,
       this.mCirclePointSizeBuffer.glBuffer,
       0,
-      // new Float32Array(this.mCirclePointSizeBuffer.getRawBuffer()),
-      pointSizeBuffer,
+    );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(
+        this.mCirclePointSizeBuffer
+          .getRawBuffer()
+          .slice(0, this.mCirclePointSizeBuffer.getSize()),
+      ),
+      gl.DYNAMIC_DRAW,
     );
 
     // Set uniforms
@@ -639,13 +592,30 @@ export class DebugRenderer {
       this.mLinePositionAttr,
       this.mLinePositionBuffer.glBuffer,
       0,
-      new Float32Array(this.mLinePositionBuffer.getRawBuffer()),
     );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array(
+        this.mLinePositionBuffer
+          .getRawBuffer()
+          .slice(0, this.mLinePositionBuffer.getSize()),
+      ),
+      gl.DYNAMIC_DRAW,
+    );
+
     this.mLineMaterial.setVertexAttributeBuffer(
       this.mLineColorAttr,
       this.mLineColorBuffer.glBuffer,
       0,
-      new Uint8Array(this.mLineColorBuffer.getRawBuffer()),
+    );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Uint8Array(
+        this.mLineColorBuffer
+          .getRawBuffer()
+          .slice(0, this.mLineColorBuffer.getSize()),
+      ),
+      gl.DYNAMIC_DRAW,
     );
 
     // Set uniforms
@@ -742,10 +712,7 @@ export class DebugRenderer {
     );
     this.mCircleMaterial.addTexture(
       'uDiffuseTexture',
-      new Texture(
-        // context, R.drawable.debug_circle
-        { assetName: 'debug_circle.png' },
-      ),
+      new Texture({ assetName: 'debug_circle.png' }),
     );
 
     this.mLineShader = new ShaderProgram(
@@ -789,6 +756,3 @@ export class DebugRenderer {
     this.mLineColorBuffer.clear();
   }
 }
-
-// Object.assign(DebugRenderer.prototype, Module.Draw);
-// Object.setPrototypeOf(this, Module.Draw.prototype);

@@ -15,10 +15,6 @@ export class WaterTool extends Tool {
     this.mParticleFlags =
       ParticleFlag.waterParticle | ParticleFlag.colorMixingParticle;
     this.mParticleGroupFlags = ParticleGroupFlag.particleGroupCanBeEmpty;
-    console.log({
-      particleFlags: this.mParticleFlags,
-      groupFlags: this.mParticleGroupFlags,
-    });
   }
 
   /**
@@ -27,10 +23,8 @@ export class WaterTool extends Tool {
    */
   protected applyTool(pInfo: PointerInfo): void {
     if (this.mParticleGroup != null) {
-      console.log('Has this.mParticleGroup');
       pInfo.setParticleGroup(this.mParticleGroup);
     } else if (pInfo.getParticleGroup() != null) {
-      console.log('Has pInfo.mParticleGroup');
       this.mParticleGroup = pInfo.getParticleGroup();
     }
 

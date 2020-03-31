@@ -383,28 +383,17 @@ export class Material {
     attr: AttributeInfo | string,
     buffer?: WebGLBuffer,
     offset?: number,
-    data?: ArrayBuffer | number[],
-    useWhatever?: boolean,
   ): void {
     const gl = this.getWebGLContext();
     // buffer.position(offset);
     if (typeof attr === 'string') {
       attr = this.mVertexAttributes.get(attr);
     }
-    // if (!(buffer instanceof WebGLBuffer)) {
-    //   console.log('Not WebGL Buffer');
-    // }
+
     if (buffer) {
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     }
-    if (data) {
-      const typedArray = useWhatever
-        ? new Uint8Array(data)
-        : data instanceof Float32Array
-        ? data
-        : new Float32Array(data);
-      gl.bufferData(gl.ARRAY_BUFFER, typedArray, gl.DYNAMIC_DRAW);
-    }
+
     gl.vertexAttribPointer(
       attr.mLocation,
       attr.mNumComponents,
@@ -413,17 +402,7 @@ export class Material {
       attr.mStride,
       offset,
     );
-    // gl.bindBuffer(gl.ARRAY_BUFFER, null);
   }
-
-  // public void setVertexAttributeBuffer(name: string, buffer: WebGLBuffer, offset: number) {
-  //     AttributeInfo attr = mVertexAttributes.get(name);
-  //     buffer.position(offset);
-  //     GLES20.glVertexAttribPointer(
-  //             attr.mLocation, attr.mNumComponents,
-  //             attr.mComponentType.getGlType(), attr.mNormalized,
-  //             attr.mStride, buffer);
-  // }
 
   /**
    * Provide access to the ShaderProgram function

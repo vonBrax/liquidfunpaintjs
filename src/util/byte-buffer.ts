@@ -38,7 +38,9 @@ export class ByteBuffer {
   }
 
   sendToEmbind(): void {
-    const byteBuffer = new Float32Array(this.slice());
+    const byteBuffer = new Float32Array(
+      this.buffer.slice(this.cursor, this.byteLength),
+    );
     const embind = new Float32Array(
       Module.HEAPU8.buffer,
       this.pointer,
@@ -125,6 +127,7 @@ export class ByteBuffer {
     }
     this.view.setFloat32(index, float, this.isLittleEndian);
     this.cursor += 4;
+    this.byteLength += 4;
   }
 
   position(): number;
@@ -135,6 +138,13 @@ export class ByteBuffer {
       return;
     }
     return this.cursor;
+  }
+
+  setSize(bytes: number): void {
+    if (bytes < 0 || bytes > this.limit) {
+      throw new Error('Invalid size: "' + bytes + '" for limit ' + this.limit);
+    }
+    this.byteLength = bytes;
   }
 
   slice(): ArrayBuffer {

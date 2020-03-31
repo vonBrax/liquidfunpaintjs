@@ -65,13 +65,8 @@ export class ParticleRenderer {
     this.mParticlePositionBuffer.createGLBuffer();
     this.mParticlePositionBuffer.createEmbindBuffer();
 
-    // this.mParticleColorBuffer = createBuffer(
-    //   1 * 4 * Renderer.MAX_PARTICLE_COUNT,
-    //   true,
-    //   ArrayViewType.UINT8,
-    // );
     this.mParticleColorBuffer = new ByteBuffer(
-      1 * 4 * Renderer.MAX_PARTICLE_COUNT,
+      4 * 1 * Renderer.MAX_PARTICLE_COUNT,
     );
     this.mParticleColorBuffer.createGLBuffer();
     this.mParticleColorBuffer.createEmbindBuffer();
@@ -110,31 +105,42 @@ export class ParticleRenderer {
       const worldParticleCount = ps.GetParticleCount();
 
       // Grab the most current particle buffers
-      ps.CopyPositionBuffer(
-        0,
-        worldParticleCount,
-        this.mParticlePositionBuffer.getPointer(),
-        this.mParticlePositionBuffer.getLimit(),
-      );
+      if (worldParticleCount > 0) {
+        ps.CopyPositionBuffer(
+          0,
+          worldParticleCount,
+          this.mParticlePositionBuffer.getPointer(),
+          this.mParticlePositionBuffer.getLimit(),
+        );
+        // 2 float numbers per particle (x, y)
+        this.mParticlePositionBuffer.setSize(2 * 4 * worldParticleCount);
 
-      ps.CopyColorBuffer(
-        0,
-        worldParticleCount,
-        this.mParticleColorBuffer.getPointer(),
-        this.mParticleColorBuffer.getLimit(),
-      );
+        ps.CopyColorBuffer(
+          0,
+          worldParticleCount,
+          this.mParticleColorBuffer.getPointer(),
+          this.mParticleColorBuffer.getLimit(),
+        );
+        // 4 uint8 numbers per particle (r,g,b,a)
+        this.mParticleColorBuffer.setSize(4 * 1 * worldParticleCount);
 
-      ps.CopyWeightBuffer(
-        0,
-        worldParticleCount,
-        this.mParticleWeightBuffer.getPointer(),
-        this.mParticleWeightBuffer.getLimit(),
-      );
+        ps.CopyWeightBuffer(
+          0,
+          worldParticleCount,
+          this.mParticleWeightBuffer.getPointer(),
+          this.mParticleWeightBuffer.getLimit(),
+        );
+        // 1 float number per particle (weight)
+        this.mParticleWeightBuffer.setSize(1 * 4 * worldParticleCount);
+      }
 
       gl.clearColor(0, 0, 0, 0);
 
+      // gl.colorMask(true, true, true, true);
       // Draw the particles
       this.drawParticles();
+
+      // gl.colorMask(true, true, true, false);
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
@@ -180,9 +186,9 @@ export class ParticleRenderer {
     const instanceOffset = pg.GetBufferIndex();
     const particleCount = pg.GetParticleCount();
 
-    const gl: WebGL2RenderingContext = state.get(
+    const gl: WebGLRenderingContext = state.get(
       'context',
-    ) as WebGL2RenderingContext;
+    ) as WebGLRenderingContext;
 
     // Draw!
     gl.drawArrays(gl.POINTS, instanceOffset, particleCount);
@@ -193,12 +199,11 @@ export class ParticleRenderer {
    * into a list. We draw these to temp mRenderSurface[0].
    */
   private drawWaterParticles(): void {
-    const gl: WebGL2RenderingContext = state.get(
+    const gl: WebGLRenderingContext = state.get(
       'context',
-    ) as WebGL2RenderingContext;
+    ) as WebGLRenderingContext;
     // Draw all water particles to temp render surface 0
     this.mRenderSurface[0].beginRender(gl.COLOR_BUFFER_BIT);
-
     this.mWaterParticleMaterial.beginRender();
 
     // Set attribute arrays
@@ -212,9 +217,9 @@ export class ParticleRenderer {
       new Float32Array(
         Module.HEAPU8.buffer,
         this.mParticlePositionBuffer.getPointer(),
-        this.mParticlePositionBuffer.getLimit(),
+        this.mParticlePositionBuffer.getSize() / 4,
       ),
-      gl.DYNAMIC_DRAW,
+      gl.STATIC_DRAW,
     );
 
     this.mWaterParticleMaterial.setVertexAttributeBuffer(
@@ -227,9 +232,9 @@ export class ParticleRenderer {
       new Uint8Array(
         Module.HEAPU8.buffer,
         this.mParticleColorBuffer.getPointer(),
-        this.mParticleColorBuffer.getLimit(),
+        this.mParticleColorBuffer.getSize(),
       ),
-      gl.DYNAMIC_DRAW,
+      gl.STATIC_DRAW,
     );
 
     this.mWaterParticleMaterial.setVertexAttributeBuffer(
@@ -242,9 +247,9 @@ export class ParticleRenderer {
       new Float32Array(
         Module.HEAPU8.buffer,
         this.mParticleWeightBuffer.getPointer(),
-        this.mParticleWeightBuffer.getLimit(),
+        this.mParticleWeightBuffer.getSize() / 4,
       ),
-      gl.DYNAMIC_DRAW,
+      gl.STATIC_DRAW,
     );
 
     // Set uniforms
@@ -264,10 +269,8 @@ export class ParticleRenderer {
         if (
           currGroup.GetGroupFlags() ===
           Tool.getTool(ToolType.WATER).getParticleGroupFlags()
-          // Tool.getTool(Tool.ToolType.WATER).getParticleGroupFlags()
         ) {
           this.drawParticleGroup(currGroup);
-          // console.log(this.mParticleColorBuffer.bufferData);
         } else {
           this.mParticleRenderList.push(currGroup);
         }
@@ -282,10 +285,12 @@ export class ParticleRenderer {
 
     this.mRenderSurface[0].endRender();
 
-    this.mBlurRenderer.draw(
-      this.mRenderSurface[0].getTexture(),
-      this.mRenderSurface[0],
-    );
+    if (state.get('blur')) {
+      this.mBlurRenderer.draw(
+        this.mRenderSurface[0].getTexture(),
+        this.mRenderSurface[0],
+      );
+    }
   }
 
   /**
@@ -311,9 +316,9 @@ export class ParticleRenderer {
       new Float32Array(
         Module.HEAPU8.buffer,
         this.mParticlePositionBuffer.getPointer(),
-        this.mParticlePositionBuffer.getLimit(),
+        this.mParticlePositionBuffer.getSize() / 4,
       ),
-      gl.DYNAMIC_DRAW,
+      gl.STATIC_DRAW,
     );
 
     this.mParticleMaterial.setVertexAttributeBuffer(
@@ -326,9 +331,9 @@ export class ParticleRenderer {
       new Uint8Array(
         Module.HEAPU8.buffer,
         this.mParticleColorBuffer.getPointer(),
-        this.mParticleColorBuffer.getLimit(),
+        this.mParticleColorBuffer.getSize(),
       ),
-      gl.DYNAMIC_DRAW,
+      gl.STATIC_DRAW,
     );
 
     // Set uniforms
@@ -352,10 +357,13 @@ export class ParticleRenderer {
     this.mParticleMaterial.endRender();
 
     this.mRenderSurface[1].endRender();
-    this.mBlurRenderer.draw(
-      this.mRenderSurface[1].getTexture(),
-      this.mRenderSurface[1],
-    );
+
+    if (state.get('blur')) {
+      this.mBlurRenderer.draw(
+        this.mRenderSurface[1].getTexture(),
+        this.mRenderSurface[1],
+      );
+    }
   }
 
   public onSurfaceChanged(width: number, height: number): void {
@@ -384,7 +392,7 @@ export class ParticleRenderer {
       this.mTransformFromWorld,
       vec3.fromValues(
         (2.0 * xRatio) / Renderer.getInstance().sRenderWorldWidth,
-        (2 * yRatio) / Renderer.getInstance().sRenderWorldHeight,
+        (2.0 * yRatio) / Renderer.getInstance().sRenderWorldHeight,
         1,
       ),
     );
@@ -437,7 +445,7 @@ export class ParticleRenderer {
         'aWeight',
         1,
         Material.AttrComponentType.FLOAT(),
-        1,
+        4,
         false,
         0,
       );
@@ -506,12 +514,8 @@ export class ParticleRenderer {
   }
 
   public reset(): void {
-    // const gl: WebGL2RenderingContext = state.get(
-    //   'context',
-    // ) as WebGL2RenderingContext;
-    // this.mParticlePositionBuffer = gl.createBuffer();
-    // this.mParticleColorBuffer = gl.createBuffer();
-    // this.mParticleWeightBuffer = gl.createBuffer();
+    this.mParticlePositionBuffer.clear();
     this.mParticleColorBuffer.clear();
+    this.mParticleWeightBuffer.clear();
   }
 }

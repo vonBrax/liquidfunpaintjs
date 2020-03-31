@@ -193,7 +193,10 @@ export abstract class Tool {
 
         // Create new PointerInfo as this is a new pointer
         const pInfo: PointerInfo = new PointerInfo(pID);
-        console.assert(Tool.mGroupMap.get(pID) == null);
+        console.assert(
+          Tool.mGroupMap.get(pID) == null,
+          'mGroupMap with same ID already exist.',
+        );
         this.processTouchInput(e, pInfo, pointerIndex, true, true);
         // Put updated PointerInfo back in map
         Tool.mGroupMap.set(pID, pInfo);

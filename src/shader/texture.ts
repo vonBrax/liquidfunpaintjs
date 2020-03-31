@@ -136,22 +136,8 @@ export class Texture {
         this.generateTexture();
         this._loadTexture(/* context,*/ resourceId, scale, wrapS, wrapT);
       } else if (assetName) {
-        // console.log('Loading texture: ' + assetName);
         this.mName = assetName;
         this.generateTexture();
-        // const gl: WebGLRenderingContext = state.get('context');
-        // const pixel = new Uint8Array([0, 0, 255, 255]);
-        // gl.texImage2D(
-        //   gl.TEXTURE_2D,
-        //   0,
-        //   gl.RGBA,
-        //   1,
-        //   1,
-        //   0,
-        //   gl.RGBA,
-        //   gl.UNSIGNED_BYTE,
-        //   pixel,
-        // );
         FileHelper.loadBitmap(assetName).then(bitmap =>
           this.loadTexture(bitmap, scale, wrapS, wrapT),
         );
@@ -160,16 +146,16 @@ export class Texture {
   }
 
   private generateTexture(): void {
-    const gl: WebGL2RenderingContext = state.get(
+    const gl: WebGLRenderingContext = state.get(
       'context',
-    ) as WebGL2RenderingContext;
+    ) as WebGLRenderingContext;
     //   gl.genTextures(1, this.mTextureId, 0);
     this.mTextureId[0] = gl.createTexture();
 
     // Globally storing all textures for debug
-    const textures = state.get('textures') || [];
-    textures.push(this.mTextureId[0]);
-    state.set('textures', textures);
+    // const textures = state.get('textures') || [];
+    // textures.push(this.mTextureId[0]);
+    // state.set('textures', textures);
   }
 
   /**
@@ -234,23 +220,32 @@ export class Texture {
     // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, )
     gl.bindTexture(gl.TEXTURE_2D, this.mTextureId[0]);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmap);
+
     // WebGL1 has different requirements for power of 2 images
     // vs non power of 2 images so check if the image is a
     // power of 2 in both dimensions.
-    if (isPowerOf2(this.mWidth) && isPowerOf2(this.mHeight)) {
-      // Yes, it'S a power of 2. Generate mips.
-      gl.generateMipmap(gl.TEXTURE_2D);
-    } else {
-      // No, it's not a power of 2. Turn of mips and set
-      // wrapping
-      // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS.getGlType());
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT.getGlType());
-    }
+    // if (isPowerOf2(this.mWidth) && isPowerOf2(this.mHeight)) {
+    //   // Yes, it'S a power of 2. Generate mips.
+    //   console.log('using mip maps');
+    //   console.log(bitmap);
+    //   gl.generateMipmap(gl.TEXTURE_2D);
+    // } else {
+    //   // No, it's not a power of 2. Turn of mips and set
+    //   // wrapping
+    //   // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    //   // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    //   // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS.getGlType());
+    //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT.getGlType());
+    // }
+
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS.getGlType());
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT.getGlType());
+
     // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmap);
     // gl.texImage2D(
     //   gl.TEXTURE_2D,

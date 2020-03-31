@@ -51,20 +51,16 @@ class PointerInputBuffer {
 
   putPoint(index: number, point: Vector2f): number {
     let currIndex = index;
-    // this.mByteBuffer.putFloat(currIndex, point.x);
 
     this.mByteBuffer.putFloat(currIndex, point.x);
-    // this.mByteBuffer.bufferData.set([point.x], currIndex);
-    currIndex += 4; // this.mByteBuffer.byteLength; // 4
+    currIndex += 4;
     this.mByteBuffer.putFloat(currIndex, point.y);
-    // this.mByteBuffer.bufferData.set([point.y], currIndex);
-    currIndex += 4; // this.mByteBuffer.byteLength;
+    currIndex += 4;
 
     return currIndex;
   }
 
   reset(): void {
-    // this.mByteBuffer.bufferData.fill(0);
     this.mByteBuffer.clear();
     this.mBufferEnd = 0;
   }

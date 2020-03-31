@@ -100,6 +100,7 @@ export class Renderer {
 
     // Initialize all the different renderers
     this.mParticleRenderer = new ParticleRenderer();
+
     if (Renderer.DEBUG_DRAW) {
       const dr = new DebugRenderer();
       console.log(dr);
@@ -147,10 +148,6 @@ export class Renderer {
 
     this.reset();
 
-    /**
-     * @todo: REMOVE
-     */
-    state.set('DEBUG', true);
     this.mTime = window.performance.now() * 1000000;
   }
 
@@ -161,7 +158,7 @@ export class Renderer {
      * @todo: See where else BuildConfig is being used
      * and implement it accordingly
      */
-    if (state.get('DEBUG')) {
+    if (state.get('stats')) {
       const time = window.performance.now() * 1000000;
 
       if (time - this.mTime > Renderer.ONE_SEC) {
@@ -216,6 +213,8 @@ export class Renderer {
       }
       this.mFrames++;
       this.totalFrames++;
+    } else {
+      document.getElementById('log').textContent = '';
     }
 
     this.update(Renderer.TIME_STEP);
@@ -225,15 +224,14 @@ export class Renderer {
 
   // Override
   public onSurfaceChanged(
-    /* GL10 */ gl: WebGLRenderingContext,
+    gl: WebGLRenderingContext,
     width: number,
     height: number,
   ): void {
-    // const gl: WebGL2RenderingContext = state.get(
-    //   'context',
-    // ) as WebGL2RenderingContext;
+    gl.viewport(0, 0, width, height);
     this.sRenderWorldHeight = Renderer.WORLD_HEIGHT;
     this.sRenderWorldWidth = (width * Renderer.WORLD_HEIGHT) / height;
+
     this.sScreenWidth = width;
     this.sScreenHeight = height;
 
@@ -242,7 +240,6 @@ export class Renderer {
       canvas.width = width;
       canvas.height = height;
     }
-    gl.viewport(0, 0, width, height);
 
     // Reset the boundary
     this.initBoundaries();
@@ -297,8 +294,6 @@ export class Renderer {
           Renderer.POSITION_ITERATIONS,
           Renderer.PARTICLE_ITERATIONS,
         );
-        // console.log(this.acquireParticleSystem().GetParticleCount());
-        // console.log(this.acquireParticleSystem().GetParticleGroupList());
       } catch (e) {
         console.error(e);
       } finally {
@@ -313,6 +308,7 @@ export class Renderer {
       'context',
     ) as WebGLRenderingContext;
     gl.clearColor(1, 1, 1, 1);
+
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     // gl.clearDepth(1.0);

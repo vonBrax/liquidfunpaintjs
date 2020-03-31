@@ -45,25 +45,6 @@ export class ShaderProgram {
     WebGLShader
   >();
 
-  //   private ParamInfo = class {
-  //     mName: string;
-  //     mSize: number;
-  //     mType: number;
-  //     mLocation: number;
-
-  //     private constructor(
-  //       name: string,
-  //       size: number,
-  //       type: number,
-  //       location: number,
-  //     ) {
-  //       this.mName = name;
-  //       this.mSize = size;
-  //       this.mType = type;
-  //       this.mLocation = location;
-  //     }
-  //   };
-
   /// Member variables
   protected mProgram: WebGLProgram;
   private mVSName: string = null;
@@ -77,7 +58,9 @@ export class ShaderProgram {
   /// Temp variables for getting OpenGL params
   /// We have this because we might query params during runtime and we can
   /// reuse this object for all such calls.
-  private static sGlParams: number[] = [];
+  private static sGlParams: number[] = Array<number>(
+    ShaderProgram.MAX_NUM_PARAMS,
+  );
 
   /// Static helper methods
 
@@ -262,12 +245,6 @@ export class ShaderProgram {
       this.mProgram,
       gl.ACTIVE_ATTRIBUTES,
     );
-    // const maxNameSize = ShaderProgram.getProgramiv(
-    //   this.mProgram,
-    //   gl.ACTIVE_ATTRIBUTE_MAX_LENGTH,
-    // );
-
-    //   byte[] nameBuffer = new byte[maxNameSize];
 
     for (let i = 0; i < numAttributes; ++i) {
       const info = gl.getActiveAttrib(this.mProgram, i);
@@ -299,11 +276,11 @@ export class ShaderProgram {
       this.mProgram,
       gl.ACTIVE_UNIFORMS,
     );
-    console.log(this.mVSName + ' - ' + this.mFSName + ': ' + numUniforms);
 
     for (let i = 0; i < numUniforms; ++i) {
       const uniform = gl.getActiveUniform(this.mProgram, i);
       const location = gl.getUniformLocation(this.mProgram, uniform.name);
+
       this.mUniforms.set(
         uniform.name,
         new ParamInfo(uniform.name, uniform.size, uniform.type, location),
