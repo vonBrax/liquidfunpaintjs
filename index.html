@@ -8,13 +8,23 @@
 </head>
 <body>
   <h1>LIQUIDFUN PAINT!</h1>
+  <button id="play" type="button">PLAY</button>
+  <button id="pause" type="button">PAUSE</button>
   <button id="reset" type="button">RESET</button>
-  <div style="position:relative">
+  <div style="position:relative; background-color: black">
+    <!-- Width: 1764 - Height: 1080 -->
     <canvas id="canvas" style="outline: 1px solid black"></canvas>
-    <div id="log" style="white-space: pre-line; padding: 1rem; position: absolute; right: 0; top: 0; font-size:0.75rem"></div>
+    <div id="log" style="pointer-events: none;white-space: pre-line; padding: 1rem; position: absolute; right: 0; top: 0; font-size:0.75rem"></div>
   </div>
 
   <div style="display: flex; justify-content: space-evenly;">
+
+    <div id="info">
+      <p>Info</p>
+      <div><label><input type="checkbox" name="info" value="stats">Stats</label></div>
+      <div><label><input type="checkbox" name="info" value="debug" checked>Debug Render</label></div>
+      <div><label><input type="checkbox" name="info" value="blur">Blur Renderer</label></div>
+    </div>
 
     <div id="tools">
       <p>Tool</p>
@@ -103,13 +113,19 @@
         </div>
         <div>
           <label>
-            <input type="radio" name="color" value="ffe89a3a">
-            <span style="color: #e89a3a; background-color: #e89a3a">AI</span>
+            <input type="radio" name="color" value="fff7eb83">
+            <span style="color: #f7eb83; background-color: #f7eb83">AI</span>
           </label>
         </div>
       </div>
       <div>
         <p>&nbsp;</p>
+        <div>
+          <label>
+            <input type="radio" name="color" value="ffe89a3a">
+            <span style="color: #e89a3a; background-color: #e89a3a">AI</span>
+          </label>
+        </div>
         <div>
           <label>
             <input type="radio" name="color" value="ffe44426">
@@ -189,8 +205,12 @@
       width: 100%;
       height: 80vh;
       height: 40vh;
-      /* width: 256px;
-      height: 256px; */
+      width: 100vw;
+      height: 100vh;
+      /* width: calc(1764px / 2);
+      height: calc(1080px / 2); */
+
+      background: black;
     }
   </style>
   <!-- <script src="src/liquidfun/a.out.js"></script> -->
@@ -199,7 +219,7 @@
   <script>
     window.__caipps__ = window.__caipps__ || {};
     const canvas = document.getElementById('canvas');
-    const gl = canvas.getContext('webgl');
+    const gl = canvas.getContext('webgl', { alpha: false });
     window.__caipps__.canvas = canvas;
     window.__caipps__.context = gl;
 
