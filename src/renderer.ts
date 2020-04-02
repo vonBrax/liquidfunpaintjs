@@ -47,9 +47,6 @@ export class Renderer {
   public sScreenWidth = 1;
   public sScreenHeight = 1;
 
-  /// Member variables
-  // private mActivity: Activity = null;
-
   // Renderer class owns all Box2D objects, for thread-safety
   private mWorld: World = null;
   private mParticleSystem: ParticleSystem = null;
@@ -57,7 +54,6 @@ export class Renderer {
 
   // Variables for thread synchronization
   private mSimulation = false;
-  // private mWorldLock: Lock = new ReentrantLock();
 
   private mParticleRenderer: ParticleRenderer;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,33 +74,36 @@ export class Renderer {
        * @todo Investigate what is the delete method.
        * - Not from DebugRenderer
        * - Not from b2Draw
-       * - ?
+       *
+       * @update
+       * It is probably introduced by swig and
+       * it server the purpose of releasing memory
+       * allocated by the native code (similar to embind)
        */
       // this.mDebugRenderer.delete();
       this.mDebugRenderer = null;
     }
   }
 
-  // private constructor() {}
-
   public static getInstance(): Renderer {
     return this._instance;
   }
 
-  public init(/* activity: Activity */): void {
+  public init(): void {
+    // Adjust world height based on pixel density
+    Renderer.WORLD_HEIGHT /= window.devicePixelRatio;
+
     // TS does not seem to initialize class properties
     // pointing to other static property
     this.sRenderWorldWidth = Renderer.WORLD_HEIGHT;
     this.sRenderWorldHeight = Renderer.WORLD_HEIGHT;
-    // this.mActivity = activity;
 
     // Initialize all the different renderers
     this.mParticleRenderer = new ParticleRenderer();
 
     if (Renderer.DEBUG_DRAW) {
       const dr = new DebugRenderer();
-      console.log(dr);
-      // console.log(dr);
+
       // eslint-disable-next-line
       // @ts-ignore
       const Derived = Module.Draw.extend('Draw', {
@@ -134,12 +133,8 @@ export class Renderer {
       // eslint-disable-next-line
       // @ts-ignore
       dr.__parent = instance.__parent;
-      console.log(instance);
+
       this.mDebugRenderer = dr;
-      // this.mDebugRenderer = new DebugRenderer();
-      // this.mDebugRenderer.b2Draw.SetFlags(
-      //   this.mDebugRenderer.shapeBit | this.mDebugRenderer.particleBit,
-      // );
       this.mDebugRenderer.SetFlags(
         0x0001 | 0x0020, // shapeBit // particleBit
         // this.mDebugRenderer.shapeBit | this.mDebugRenderer.particleBit,
@@ -171,16 +166,14 @@ export class Renderer {
         const avefps: number =
           (this.totalFrames / (time - this.mStartTime)) * Renderer.ONE_SEC;
         const count: number = this.mParticleSystem.GetParticleCount();
-        // Log.d(Renderer.TAG, fps + ' fps (Now)');
-        // Log.d(Renderer.TAG, avefps + ' fps (Average)');
-        // Log.d(Renderer.TAG, count + ' particles');
+
         this.mTime = time;
         this.mFrames = 0;
 
         const msg = `
           ${fps} fps (Now)
           ${avefps} fps(Average)
-          ${this.mParticleSystem.GetParticleCount()} particles
+          ${count} particles
           ${this.mParticleSystem.GetParticleGroupCount()} particle groups
           ${this.mWorld.GetBodyCount()} bodies
         `;
@@ -229,8 +222,32 @@ export class Renderer {
     height: number,
   ): void {
     gl.viewport(0, 0, width, height);
-    this.sRenderWorldHeight = Renderer.WORLD_HEIGHT;
-    this.sRenderWorldWidth = (width * Renderer.WORLD_HEIGHT) / height;
+
+    /**
+     * @todo:
+     * Experimenting here setting WORLD_HEIGHT to be
+     * 1% of the canvas height
+     *   - Renderer.WORLD_HEIGHT = Math.floor(height / 100);
+     *
+     * Radius in pixels =
+     *  (Renderer.PARTICLE_RADIUS / sRenderWorldHeight) * height
+     * (to calculate volume later and amount of particles needed
+     * to fill a glass)
+     */
+
+    // this.sRenderWorldHeight = Renderer.WORLD_HEIGHT;
+    // this.sRenderWorldWidth = (width * Renderer.WORLD_HEIGHT) / height;
+    let xRatio = 1;
+    let yRatio = 1;
+
+    if (width < height) {
+      xRatio = width / height;
+    } else {
+      yRatio = height / width;
+    }
+
+    this.sRenderWorldHeight = Renderer.WORLD_HEIGHT * yRatio;
+    this.sRenderWorldWidth = Renderer.WORLD_HEIGHT * xRatio;
 
     this.sScreenWidth = width;
     this.sScreenHeight = height;
@@ -252,24 +269,20 @@ export class Renderer {
   }
 
   // Override
-  // Parameters: gl: WebGLRenderingContext (GL10), config: EGLConfig
-  public async onSurfaceCreated(/*gl: WebGLRenderingContext*/): Promise<void> {
+  public async onSurfaceCreated(): Promise<void> {
     if (this.mWorld == null) {
       throw new Error('Init world before rendering');
     }
 
     // Load all shaders
-    await ShaderProgram.loadAllShaders(
-      // this.mActivity.getAssets())
-      new AssetManager(),
-    );
+    await ShaderProgram.loadAllShaders(new AssetManager());
 
     TextureRenderer.getInstance().onSurfaceCreated();
 
-    await this.mParticleRenderer.onSurfaceCreated(/* this.mActivity */);
+    await this.mParticleRenderer.onSurfaceCreated();
 
     if (Renderer.DEBUG_DRAW) {
-      this.mDebugRenderer.onSurfaceCreated(/* this.mActivity */);
+      this.mDebugRenderer.onSurfaceCreated();
     }
   }
 
@@ -307,14 +320,9 @@ export class Renderer {
     const gl: WebGLRenderingContext = state.get(
       'context',
     ) as WebGLRenderingContext;
+
     gl.clearColor(1, 1, 1, 1);
-
     gl.clear(gl.COLOR_BUFFER_BIT);
-
-    // gl.clearDepth(1.0);
-    // gl.enable(gl.DEPTH_TEST);
-    // gl.depthFunc(gl.LEQUAL);
-    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // Draw particles
     this.mParticleRenderer.draw();
@@ -334,7 +342,7 @@ export class Renderer {
 
   private deleteWorld(): void {
     const world: World = this.acquireWorld();
-    console.log('Deleting world.');
+
     try {
       if (this.mBoundaryBody != null) {
         this.mBoundaryBody.delete();
@@ -355,7 +363,6 @@ export class Renderer {
    * Initializes the boundaries and reset the ParticleRenderer as well.
    */
   public reset(): void {
-    // const world: World =
     this.acquireWorld();
     try {
       this.deleteWorld();
@@ -377,15 +384,11 @@ export class Renderer {
 
   /** Create a new particle system */
   private initParticleSystem(): void {
-    // const world: World =
     this.acquireWorld();
     try {
       // Create a new particle system; we only use one.
       const psDef: ParticleSystemDef = new Module.ParticleSystemDef();
-      // psDef.setRadius(Renderer.PARTICLE_RADIUS);
       psDef.radius = Renderer.PARTICLE_RADIUS;
-      // psDef.setRepulsiveStrength(Renderer.PARTICLE_REPULSIVE_STRENGTH);
-      // this.mParticleSystem.SetMaxParticleCount(Renderer.MAX_PARTICLE_COUNT);
       psDef.maxCount = Renderer.MAX_PARTICLE_COUNT;
       psDef.repulsiveStrength = Renderer.PARTICLE_REPULSIVE_STRENGTH;
       this.mParticleSystem = this.mWorld.CreateParticleSystem(psDef);
@@ -408,43 +411,34 @@ export class Renderer {
       // Create native objects
       const bodyDef: BodyDef = new Module.BodyDef();
       const boundaryPolygon: PolygonShape = new Module.PolygonShape();
-
       this.mBoundaryBody = world.CreateBody(bodyDef);
 
-      const centerTop = new Module.Vec2(
+      // SetAsBox:
+      // (half-width, half-height, center, angle)
+
+      // TOP
+      /**
+       * @todo:
+       * Replace the parameters calls to SetAsBox
+       * (no need to create the Vec2 here)
+       */
+      const topCenter = new Module.Vec2(
         this.sRenderWorldWidth / 2,
         this.sRenderWorldHeight + Renderer.BOUNDARY_THICKNESS,
       );
-      // boundary definitions
-      // top
-      // boundaryPolygon.SetAsBox(
-      //   this.sRenderWorldWidth,
-      //   Renderer.BOUNDARY_THICKNESS,
-      //   this.sRenderWorldWidth / 2,
-      //   this.sRenderWorldHeight + Renderer.BOUNDARY_THICKNESS,
-      //   0,
-      // );
-
       boundaryPolygon.SetAsBox(
-        this.sRenderWorldWidth,
-        Renderer.BOUNDARY_THICKNESS,
-        centerTop,
-        0,
+        this.sRenderWorldWidth, // width
+        Renderer.BOUNDARY_THICKNESS, // height
+        topCenter, // Center
+        0, // Angle
       );
       this.mBoundaryBody.CreateFixture(boundaryPolygon, 0.0);
 
+      // BOTTOM
       const centerBottom = new Module.Vec2(
         this.sRenderWorldWidth / 2,
         -Renderer.BOUNDARY_THICKNESS,
       );
-      // bottom
-      // boundaryPolygon.SetAsBox(
-      //   this.sRenderWorldWidth,
-      //   Renderer.BOUNDARY_THICKNESS,
-      //   this.sRenderWorldWidth / 2,
-      //   -Renderer.BOUNDARY_THICKNESS,
-      //   0,
-      // );
       boundaryPolygon.SetAsBox(
         this.sRenderWorldWidth,
         Renderer.BOUNDARY_THICKNESS,
@@ -453,19 +447,11 @@ export class Renderer {
       );
       this.mBoundaryBody.CreateFixture(boundaryPolygon, 0.0);
 
+      // LEFT
       const centerLeft = new Module.Vec2(
         -Renderer.BOUNDARY_THICKNESS,
         this.sRenderWorldHeight / 2,
       );
-
-      // left
-      // boundaryPolygon.setAsBox(
-      //   Renderer.BOUNDARY_THICKNESS,
-      //   this.sRenderWorldHeight,
-      //   -Renderer.BOUNDARY_THICKNESS,
-      //   this.sRenderWorldHeight / 2,
-      //   0,
-      // );
       boundaryPolygon.SetAsBox(
         Renderer.BOUNDARY_THICKNESS,
         this.sRenderWorldHeight,
@@ -474,18 +460,11 @@ export class Renderer {
       );
       this.mBoundaryBody.CreateFixture(boundaryPolygon, 0.0);
 
+      // RIGHT
       const centerRight = new Module.Vec2(
         this.sRenderWorldWidth + Renderer.BOUNDARY_THICKNESS,
         this.sRenderWorldHeight / 2,
       );
-      // right
-      // boundaryPolygon.setAsBox(
-      //   Renderer.BOUNDARY_THICKNESS,
-      //   this.sRenderWorldHeight,
-      //   this.sRenderWorldWidth + Renderer.BOUNDARY_THICKNESS,
-      //   this.sRenderWorldHeight / 2,
-      //   0,
-      // );
       boundaryPolygon.SetAsBox(
         Renderer.BOUNDARY_THICKNESS,
         this.sRenderWorldHeight,

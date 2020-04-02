@@ -17,18 +17,18 @@ export class ParticleMaterial extends Material {
 
   private mParticleSizeScale: number;
 
-  constructor(/* context: Context, */ json: JSONObject) {
+  constructor(json: JSONObject) {
     super(new ShaderProgram('particle.glslv', 'particle.glslf'));
 
     // Read in values from the JSON file
-    this.mParticleSizeScale = (json.particleSizeScale || 1.0) as number;
+    this.mParticleSizeScale = +json.particleSizeScale || 1.0;
 
     // Add the water texture that is scrolling
     try {
       const textureName = json[ParticleMaterial.DIFFUSE_TEXTURE_NAME] as string;
       this.addTexture(
         ParticleMaterial.DIFFUSE_TEXTURE_NAME,
-        new Texture({ /* context, */ assetName: textureName }),
+        new Texture({ assetName: textureName }),
       );
     } catch (ex) {
       Log.e(
@@ -43,6 +43,12 @@ export class ParticleMaterial extends Material {
     const gl: WebGL2RenderingContext = state.get(
       'context',
     ) as WebGL2RenderingContext;
+
+    const max = Math.max(
+      Renderer.getInstance().sRenderWorldWidth,
+      Renderer.getInstance().sRenderWorldHeight,
+    );
+
     // Specific uniforms to this material
     gl.uniform1f(
       this.getUniformLocation('uPointSize'),
@@ -51,7 +57,8 @@ export class ParticleMaterial extends Material {
         this.mParticleSizeScale *
           ParticleRenderer.FB_SIZE *
           (Renderer.PARTICLE_RADIUS /
-            Renderer.getInstance().sRenderWorldHeight),
+            // Renderer.getInstance().sRenderWorldHeight
+            max),
       ),
     );
   }

@@ -14,12 +14,6 @@ import { JSONObject } from './util/types';
 import { Log } from './util/functionsHelper';
 import { FileHelper } from './util/file-helper';
 import { BlurRenderer } from './blur-renderer';
-// import {
-//   createBuffer,
-//   destroyBuffer,
-//   ParticleBuffer,
-//   ArrayViewType,
-// } from './util/wasm-buffer';
 import { Tool, ToolType } from './tool/tool';
 import { ByteBuffer } from './util/byte-buffer';
 
@@ -51,7 +45,6 @@ export class ParticleRenderer {
   private mTransformFromTexture: mat4 = mat4.create(); // = Array(16);
   private mTransformFromWorld: mat4 = mat4.create();
 
-  // private mParticleColorBuffer: ParticleBuffer;
   private mParticleColorBuffer: ByteBuffer;
   private mParticlePositionBuffer: ByteBuffer;
   private mParticleWeightBuffer: ByteBuffer;
@@ -136,11 +129,8 @@ export class ParticleRenderer {
 
       gl.clearColor(0, 0, 0, 0);
 
-      // gl.colorMask(true, true, true, true);
       // Draw the particles
       this.drawParticles();
-
-      // gl.colorMask(true, true, true, false);
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
@@ -202,6 +192,7 @@ export class ParticleRenderer {
     const gl: WebGLRenderingContext = state.get(
       'context',
     ) as WebGLRenderingContext;
+
     // Draw all water particles to temp render surface 0
     this.mRenderSurface[0].beginRender(gl.COLOR_BUFFER_BIT);
     this.mWaterParticleMaterial.beginRender();
@@ -300,6 +291,7 @@ export class ParticleRenderer {
     const gl: WebGL2RenderingContext = state.get(
       'context',
     ) as WebGL2RenderingContext;
+
     // Draw all non-water particles to temp render surface 1
     this.mRenderSurface[1].beginRender(gl.COLOR_BUFFER_BIT);
 
@@ -343,7 +335,6 @@ export class ParticleRenderer {
       this.mTransformFromWorld,
     );
 
-    // const ps: ParticleSystem = Renderer.getInstance().acquireParticleSystem();
     Renderer.getInstance().acquireParticleSystem();
     try {
       // Go through all the particleGroups in the render list
@@ -355,7 +346,6 @@ export class ParticleRenderer {
     }
 
     this.mParticleMaterial.endRender();
-
     this.mRenderSurface[1].endRender();
 
     if (state.get('blur')) {
@@ -377,7 +367,6 @@ export class ParticleRenderer {
     }
 
     // Set up the transform
-    // const ratio: number = height / width;
     mat4.fromScaling(
       this.mTransformFromTexture,
       vec3.fromValues(1 / xRatio, 1 / yRatio, 1),
@@ -391,14 +380,14 @@ export class ParticleRenderer {
       this.mTransformFromWorld,
       this.mTransformFromWorld,
       vec3.fromValues(
-        (2.0 * xRatio) / Renderer.getInstance().sRenderWorldWidth,
-        (2.0 * yRatio) / Renderer.getInstance().sRenderWorldHeight,
-        1,
+        2.0 * (xRatio / Renderer.getInstance().sRenderWorldWidth),
+        2.0 * (yRatio / Renderer.getInstance().sRenderWorldHeight),
+        1.0,
       ),
     );
   }
 
-  public async onSurfaceCreated(/* context: Context */): Promise<void> {
+  public async onSurfaceCreated(): Promise<void> {
     // Create the render surfaces
     for (let i = 0; i < this.mRenderSurface.length; i++) {
       this.mRenderSurface[i] = new RenderSurface(

@@ -65,7 +65,7 @@ export class WaterParticleMaterial extends Material {
       ] as string;
       this.addTexture(
         WaterParticleMaterial.DIFFUSE_TEXTURE_NAME,
-        new Texture(/* context, */ { assetName: textureName }),
+        new Texture({ assetName: textureName }),
       );
     } catch (ex) {
       Log.e(
@@ -82,6 +82,11 @@ export class WaterParticleMaterial extends Material {
       'context',
     ) as WebGL2RenderingContext;
 
+    const max = Math.max(
+      Renderer.getInstance().sRenderWorldWidth,
+      Renderer.getInstance().sRenderWorldHeight,
+    );
+
     // Specific uniforms to this material
     gl.uniform1f(
       this.getUniformLocation('uPointSize'),
@@ -90,7 +95,8 @@ export class WaterParticleMaterial extends Material {
         this.mParticleSizeScale *
           ParticleRenderer.FB_SIZE *
           (Renderer.PARTICLE_RADIUS /
-            Renderer.getInstance().sRenderWorldHeight),
+            // Renderer.getInstance().sRenderWorldHeight
+            max),
       ),
     );
     gl.uniform3fv(

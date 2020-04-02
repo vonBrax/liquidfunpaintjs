@@ -2,9 +2,9 @@ import { mat3, vec2 } from 'gl-matrix';
 import { FileHelper } from '../util/file-helper';
 import { state } from '../state';
 
-function isPowerOf2(value: number): boolean {
-  return (value & (value - 1)) == 0;
-}
+// function isPowerOf2(value: number): boolean {
+//   return (value & (value - 1)) == 0;
+// }
 
 /**
  * Defines which component types are accepted.
@@ -18,11 +18,6 @@ class WrapParam {
   constructor(glComponentType: number) {
     this.mGlComponentType = glComponentType;
   }
-
-  // (GLES20.GL_CLAMP_TO_EDGE),
-  //   MIRRORED_REPEAT(GLES20.GL_MIRRORED_REPEAT),
-  //   REPEAT(GLES20.GL_REPEAT),
-  //   DEFAULT(GLES20.GL_CLAMP_TO_EDGE);
 
   public static CLAMP_TO_EDGE(): WrapParam {
     const gl: WebGL2RenderingContext = state.get(
@@ -58,7 +53,6 @@ class WrapParam {
 }
 
 interface TextureConstructor {
-  // context?: Context;
   resourceId?: number;
   assetName?: string;
   scale?: boolean;
@@ -131,10 +125,10 @@ export class Texture {
       wrapS = wrapS || WrapParam.DEFAULT();
       wrapT = wrapT || WrapParam.DEFAULT();
       if (resourceId) {
-        this.mName = 'TODO'; //context.getResources().getResourceEntryName(resourceId);
+        this.mName = 'TODO';
         console.log('TEXTURE CONSTRUCTOR');
         this.generateTexture();
-        this._loadTexture(/* context,*/ resourceId, scale, wrapS, wrapT);
+        this._loadTexture(resourceId, scale, wrapS, wrapT);
       } else if (assetName) {
         this.mName = assetName;
         this.generateTexture();
@@ -149,13 +143,7 @@ export class Texture {
     const gl: WebGLRenderingContext = state.get(
       'context',
     ) as WebGLRenderingContext;
-    //   gl.genTextures(1, this.mTextureId, 0);
     this.mTextureId[0] = gl.createTexture();
-
-    // Globally storing all textures for debug
-    // const textures = state.get('textures') || [];
-    // textures.push(this.mTextureId[0]);
-    // state.set('textures', textures);
   }
 
   /**
@@ -217,7 +205,6 @@ export class Texture {
     this.mWidth = bitmap.naturalWidth || bitmap.width;
     this.mHeight = bitmap.naturalHeight || bitmap.height;
 
-    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, )
     gl.bindTexture(gl.TEXTURE_2D, this.mTextureId[0]);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmap);
 
@@ -226,38 +213,20 @@ export class Texture {
     // power of 2 in both dimensions.
     // if (isPowerOf2(this.mWidth) && isPowerOf2(this.mHeight)) {
     //   // Yes, it'S a power of 2. Generate mips.
-    //   console.log('using mip maps');
-    //   console.log(bitmap);
     //   gl.generateMipmap(gl.TEXTURE_2D);
     // } else {
     //   // No, it's not a power of 2. Turn of mips and set
     //   // wrapping
-    //   // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    //   // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    //   // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS.getGlType());
     //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT.getGlType());
     // }
 
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS.getGlType());
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT.getGlType());
-
-    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmap);
-    // gl.texImage2D(
-    //   gl.TEXTURE_2D,
-    //   0,
-    //   gl.RGBA,
-    //   this.mWidth,
-    //   this.mHeight,
-    //   0,
-    //   gl.RGBA,
-    //   gl.UNSIGNED_BYTE,
-    //   bitmap,
-    // );
   }
 
   /**
