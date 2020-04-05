@@ -4,8 +4,8 @@ import { Material, AttributeInfo } from './shader/material';
 import { Texture } from './shader/texture';
 import { Renderer } from './renderer';
 import { state } from './state';
-import { ByteBuffer } from './util/byte-buffer';
-import { TypedArray } from './util/wasm-buffer';
+import { ByteBuffer, TypedArray } from './util/byte-buffer';
+// import { TypedArray } from './util/wasm-buffer';
 
 // const _module: LFEmscriptenModule = window.Module as LFEmscriptenModule;
 // const { Draw } = _module;
