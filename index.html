@@ -5,15 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>SUPER COOL</title>
+  <!-- <link rel="preload" href="src/liquidfun/a.out.js" as="script"> -->
 </head>
 <body>
   <h1>LIQUIDFUN PAINT!</h1>
   <button id="play" type="button">PLAY</button>
   <button id="pause" type="button">PAUSE</button>
   <button id="reset" type="button">RESET</button>
-  <div style="position:relative; background-color: black">
+  <div style="position:relative; display: flex;">
     <!-- Width: 1764 - Height: 1080 -->
-    <canvas id="canvas" style="outline: 1px solid black"></canvas>
+    <canvas id="canvas"></canvas>
     <div id="log" style="pointer-events: none;white-space: pre-line; padding: 1rem; position: absolute; right: 0; top: 0; font-size:0.75rem"></div>
   </div>
 
@@ -205,31 +206,105 @@
       width: 100%;
       height: 80vh;
       height: 40vh;
-      width: 100vw;
-      height: 100vh;
+      height: calc(100vh - 101px);
       /* width: calc(1764px / 2);
       height: calc(1080px / 2); */
-
       background: black;
     }
   </style>
-  <!-- <script src="src/liquidfun/a.out.js"></script> -->
-  <script src="src/liquidfun/a.out.js"></script>
-  <!-- <script src="dist/bundle.js"></script> -->
-  <script>
-    window.__caipps__ = window.__caipps__ || {};
-    const canvas = document.getElementById('canvas');
-    const gl = canvas.getContext('webgl', { alpha: false });
-    window.__caipps__.canvas = canvas;
-    window.__caipps__.context = gl;
 
-    Module.onRuntimeInitialized = function() {
-      // window.__caipps__ = window.__caipps__ || {};
-      // window.__caipps__.runtimeInitialized = true;
-      window.__caipps__.module = Module;
-      window.__caipps__.init(canvas);
-      // window.__caipps__.activity.onCreate('canvas');
+  <script>
+    var Module = {
+      canvas: document.getElementById('canvas'),
+      customMessageQueue: [],
+      onCustomMessage: function(event) {
+        Module.customMessageQueue.push(event);
+      }
+    };
+  </script>
+
+  <script src="src/liquidfun/liquidfun.js"></script>
+
+  <script>
+    // Used once to premultiply image assest.
+    function premultiplyAlpha(filename) {
+      console.log('Premultiplying: '  + filename);
+
+      return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const image = new Image();
+
+        image.onload = function() {
+          const w = image.naturalWidth || image.width;
+          const h = image.naturalHeight || image.height;
+          canvas.width = w;
+          canvas.height = h;
+          canvas.style.width = w + 'px';
+          canvas.style.height = h + 'px';
+          ctx.drawImage(image, 0, 0);
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imgData.data;
+
+          if (isPremultiplied(data)) {
+            console.log('%c Skipping ' + filename + ': already premultiplied.', 'color: black; background-color: yellow;');
+            return;
+          }
+
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const a = data[i + 3];
+            const preR = Math.min((a / 255) * r, 255);
+            const preG = Math.min((a / 255) * g, 255);
+            const preB = Math.min((a / 255) * b, 255);
+            data[i] = preR;
+            data[i + 1] = preG;
+            data[i + 2] = preB;
+          }
+
+          ctx.putImageData(imgData, 0, 0);
+
+          const newImg = new Image();
+          newImg.onload = function() {
+            resolve(newImg);
+          };
+
+          newImg.onerror = function(e) {
+            reject(e);
+          };
+
+          newImg.src = canvas.toDataURL();
+
+          document.body.appendChild(newImg);
+        };
+
+        image.src = '/static/' + filename;
+      });
     }
+
+    function isPremultiplied(data) {
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+
+        if (a !== 255) {
+          if ( r > a || g > a || b > a) {
+            return false;
+          }
+        }
+      }
+
+      return true;
+    }
+
+    // premultiplyAlpha('textures/particle_blurred.png');
+    // premultiplyAlpha('textures/particle_brush.png');
+    // premultiplyAlpha('textures/canvas.png');
+    // premultiplyAlpha('debug_circle.png');
   </script>
 </body>
 </html>

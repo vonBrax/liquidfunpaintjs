@@ -11,7 +11,8 @@
     "allowJs": true,
     "lib": [
       "ES2020",
-      "dom"
+      "dom",
+      "webworker",
     ],
     // "emitDecoratorMetadata": false
   }
