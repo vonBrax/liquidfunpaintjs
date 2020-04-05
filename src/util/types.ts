@@ -3,17 +3,8 @@ export type JSONArray = JSONValue[];
 export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
 export type JSONObject = { [member: string]: JSONValue };
 
-// export interface ClassHandle<T, U> {
-//   clone(): T;
-//   delete(): void;
-//   deleteLater(): T;
-//   isAliasOf(otherClass: U): boolean;
-//   isDeleted(): boolean;
-// }
-
 declare global {
   interface EmscriptenModule {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Draw: typeof Draw;
     cwrap: typeof cwrap;
     Vec2: typeof Vec2;
@@ -27,22 +18,14 @@ declare global {
     CircleShape: typeof CircleShape;
     PolygonShape: typeof PolygonShape;
     Transform: typeof Transform;
+    canvas: HTMLCanvasElement;
+    customMessageQueue?: MessageEvent[];
   }
 }
 
-// export interface LFEmscriptenModule extends EmscriptenModule {
-//   // eslint-disable-next-line no-undef
-//   cwrap: typeof cwrap;
-//   Draw: typeof Draw;
-// }
-
-// export declare let Module: LFEmscriptenModule;
-
 export interface Caipps {
-  // module: LFEmscriptenModule;
-  module: EmscriptenModule;
-  canvas: HTMLCanvasElement;
-  context: WebGLRenderingContext;
-
-  init(canvas: HTMLCanvasElement): Promise<void>;
+  module?: EmscriptenModule;
+  canvas?: HTMLCanvasElement;
+  context?: WebGLRenderingContext;
+  init?(canvas: HTMLCanvasElement): void;
 }

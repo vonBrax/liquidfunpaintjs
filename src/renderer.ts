@@ -91,7 +91,8 @@ export class Renderer {
 
   public init(): void {
     // Adjust world height based on pixel density
-    Renderer.WORLD_HEIGHT /= window.devicePixelRatio;
+    // Renderer.WORLD_HEIGHT /= window.devicePixelRatio;
+    Renderer.WORLD_HEIGHT /= 1;
 
     // TS does not seem to initialize class properties
     // pointing to other static property
@@ -116,7 +117,7 @@ export class Renderer {
         DrawTransform: dr.DrawTransform,
       });
       const instance = new Derived();
-      console.log(instance);
+      // console.log(instance);
       instance.jsObj = dr;
       // eslint-disable-next-line
       // @ts-ignore
@@ -149,10 +150,6 @@ export class Renderer {
   // Override
   public onDrawFrame(/* GL10 */): void {
     // Show the frame rate
-    /**
-     * @todo: See where else BuildConfig is being used
-     * and implement it accordingly
-     */
     if (state.get('stats')) {
       const time = window.performance.now() * 1000000;
 
@@ -177,42 +174,15 @@ export class Renderer {
           ${this.mParticleSystem.GetParticleGroupCount()} particle groups
           ${this.mWorld.GetBodyCount()} bodies
         `;
-        document.getElementById('log').textContent = msg;
-
-        /**
-         * @todo:
-         * - Implement the Runnable either as a Web Worker
-         *  (where we probably will lose all the context here)
-         * or just as a RAF * console.log combo
-         */
-        // Implement off main thread work with Web Workers
-        // const runnable = new Runnable();
-        // Override (use prototype instead?)
-        // runnable.run = function(): void {
-        //   const message =
-        //     this.MainActivity.sVersionName +
-        //     '\n' +
-        //     fps +
-        //     ' fps\n' +
-        //     count +
-        //     ' particles\n' +
-        //     this.mParticleSystem.getParticleGroupCount() +
-        //     ' particle groups\n' +
-        //     this.mWorld.getBodyCount() +
-        //     ' bodies\n';
-        //   this.mActivity.findViewByIde(R.id.fps).setText(message);
-        // };
-        // this.mActivity.runOnUiThread(runnable);
+        postCustomMessage({ type: 'log', value: msg });
       }
       this.mFrames++;
       this.totalFrames++;
-    } else {
-      document.getElementById('log').textContent = '';
     }
 
     this.update(Renderer.TIME_STEP);
     this.render();
-    window.requestAnimationFrame(() => this.onDrawFrame());
+    requestAnimationFrame(() => this.onDrawFrame());
   }
 
   // Override
@@ -251,12 +221,6 @@ export class Renderer {
 
     this.sScreenWidth = width;
     this.sScreenHeight = height;
-
-    const canvas: HTMLCanvasElement = gl.canvas as HTMLCanvasElement;
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-    }
 
     // Reset the boundary
     this.initBoundaries();

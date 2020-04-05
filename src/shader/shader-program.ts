@@ -166,7 +166,7 @@ export class ShaderProgram {
   /**
    * Wrapper for GLES20.glGetIntegerv with a better return interface.
    */
-  private static getIntegerv(pname: number): number {
+  private static getIntegerv(pname: number): number | WebGLProgram {
     const gl: WebGL2RenderingContext = state.get(
       'context',
     ) as WebGL2RenderingContext;
@@ -216,7 +216,7 @@ export class ShaderProgram {
         'Could not link shaders ' + vsName + ' and ' + psName + '. OpenGL log:',
       );
       Log.e(ShaderProgram.TAG, gl.getProgramInfoLog(program));
-      program = 0;
+      program = null;
     }
 
     this.mVSName = vsName;
@@ -225,12 +225,6 @@ export class ShaderProgram {
   }
 
   public isShaderCompiled(): boolean {
-    // const gl: WebGLRenderingContext = state.get(
-    //   'context',
-    // ) as WebGLRenderingContext;
-    // const compiled = gl.getShaderParameter(this.mProgram, gl.COMPILE_STATUS);
-    // return this.mProgram > 0;
-    // return !!compiled;
     return !!this.mProgram;
   }
 
@@ -300,6 +294,7 @@ export class ShaderProgram {
     const gl: WebGL2RenderingContext = state.get(
       'context',
     ) as WebGL2RenderingContext;
+
     // Only reset the program and bindings if it's not the same one.
     if (ShaderProgram.getIntegerv(gl.CURRENT_PROGRAM) != this.mProgram) {
       gl.useProgram(this.mProgram);

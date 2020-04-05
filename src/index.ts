@@ -1,29 +1,87 @@
-import { Caipps /* , Module */ } from './util/types';
+import { Caipps } from './util/types';
 
 declare global {
   interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     __caipps__: Caipps;
-    Draw: typeof Draw;
   }
 }
 
-window.__caipps__.init = (canvas): Promise<void> => {
-  // window.__caipps__.module = Module;
+const canvas: HTMLCanvasElement = document.getElementById(
+  'canvas',
+) as HTMLCanvasElement;
 
-  return import(/* webpackPreload: true */ './main-activity').then(module => {
-    const activity = new module.MainActivity(canvas);
-    activity.onCreate();
+function registerListeners(): void {
+  document.getElementById('play').addEventListener('click', () => {
+    postCustomMessage({ type: 'event', name: 'play' });
   });
-};
+  document.getElementById('pause').addEventListener('click', () => {
+    postCustomMessage({ type: 'event', name: 'pause' });
+  });
+  document.getElementById('reset').addEventListener('click', () => {
+    postCustomMessage({ type: 'event', name: 'reset' });
+  });
+  document.getElementById('info').addEventListener('change', evt => {
+    const target = evt.target as HTMLInputElement;
+    if (target.value === 'stats' && !target.checked) {
+      document.getElementById('log').textContent = '';
+    }
+    postCustomMessage({
+      type: 'event',
+      name: target.value,
+      checked: target.checked,
+    });
+  });
 
-// console.log('Before importing...');
-// import(/* webpackPreload: true */ './main-activity').then(module => {
-//   console.log('MainActivity imported');
-//   window.__caipps__.activity = new module.MainActivity();
-//   if (window.__caipps__.runtimeInitialized) {
-//     window.__caipps__.activity.OnCreate(window.Module);
-//   } else {
-//     throw new Error('Module not available');
-//   }
-// });
+  document.getElementById('tools').addEventListener('change', evt => {
+    const target = evt.target as HTMLInputElement;
+    postCustomMessage({
+      type: 'event',
+      name: target.value.toUpperCase(),
+    });
+  });
+
+  document.getElementById('colors').addEventListener('change', evt => {
+    const target = evt.target as HTMLInputElement;
+    const checked: HTMLInputElement = document
+      .getElementById('tools')
+      .querySelector(':checked');
+    postCustomMessage({
+      type: 'event',
+      name: checked.value.toUpperCase(),
+      color: parseInt(target.value, 16),
+    });
+  });
+
+  /**
+   * @todo
+   * Throttle resize listener
+   */
+  window.addEventListener('resize', () => {
+    const width = Math.floor(canvas.clientWidth * window.devicePixelRatio);
+    const height = Math.floor(canvas.height * window.devicePixelRatio);
+
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+    postCustomMessage({
+      type: 'event',
+      name: 'resize',
+      data: { width, height, pixelRatio: window.devicePixelRatio },
+    });
+  });
+}
+
+Module.onCustomMessage = function(event: MessageEvent): void {
+  if (event.data.userData.type === 'ready') {
+    registerListeners();
+  } else if (event.data.userData.type === 'log') {
+    document.getElementById('log').textContent = event.data.userData.value;
+  }
+};
+if (Module.customMessageQueue) {
+  while (Module.customMessageQueue.length) {
+    const event = Module.customMessageQueue.shift();
+    Module.onCustomMessage(event);
+  }
+}

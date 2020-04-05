@@ -294,8 +294,8 @@ export abstract class Tool {
     const worldWidth = Renderer.getInstance().sRenderWorldWidth;
 
     // The dimensions of the the view (canvas)
-    const viewHeight = e.container.clientHeight; // worldHeight;
-    const viewWidth = e.container.clientWidth; // worldWidth;
+    const viewHeight = e.container.getBoundingClientRect().height; // worldHeight;
+    const viewWidth = e.container.getBoundingClientRect().width; // worldWidth;
 
     // screenX and screenY are the coordinates of
     // the pointer event

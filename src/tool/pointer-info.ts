@@ -1,11 +1,5 @@
 import { Vector2f } from '../util/vector2f';
 import { Log } from '../util/functionsHelper';
-// import {
-//   createBuffer,
-//   destroyBuffer,
-//   ParticleBuffer,
-//   ArrayViewType,
-// } from '../util/wasm-buffer';
 import { ByteBuffer } from '../util/byte-buffer';
 
 /**

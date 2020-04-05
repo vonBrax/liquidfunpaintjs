@@ -182,8 +182,9 @@ export class Texture {
     // Load texture
     // this.loadTexture(bitmap, scale, wrapS, wrapT);
     // bitmap.recycle();
-    console.log('%c LOADING TEXTURE NEEDS FIX', 'color: red');
-    console.log({ resourceId, scale, wrapS, wrapT });
+
+    // console.log('%c LOADING TEXTURE NEEDS FIX', 'color: red');
+    // console.log({ resourceId, scale, wrapS, wrapT });
   }
 
   /**

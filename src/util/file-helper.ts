@@ -22,17 +22,17 @@ export class FileHelper {
     //   console.error(ex);
     //   return null;
     // }
-    return this.loadAndPreMultiplyAlpha(fileName);
-    // return new Promise((resolve, reject) => {
-    //   const image = new Image();
-    //   image.onload = function() {
-    //     resolve(image);
-    //   };
-    //   image.onerror = function(e) {
-    //     reject(e);
-    //   };
-    //   image.src = `/static/${fileName}`;
-    // });
+    // return this.loadAndPreMultiplyAlpha(fileName);
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = function() {
+        resolve(image);
+      };
+      image.onerror = function(e) {
+        reject(e);
+      };
+      image.src = `/static/${fileName}`;
+    });
   }
 
   /**

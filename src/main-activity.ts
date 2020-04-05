@@ -13,6 +13,7 @@ export class MainActivity {
   private mWorldView: HTMLCanvasElement;
   private mUsingTool: boolean;
   private mSelected: ToolType;
+  public static devicePixelRatio = 1;
 
   constructor(canvas: HTMLCanvasElement) {
     this.mWorldView = canvas;
@@ -25,14 +26,17 @@ export class MainActivity {
     const gl: WebGLRenderingContext = state.get(
       'context',
     ) as WebGLRenderingContext;
-    await renderer.onSurfaceCreated(/* gl */);
-    const canvas: HTMLCanvasElement = gl.canvas as HTMLCanvasElement;
-    // const width = Math.floor(window.innerWidth * window.devicePixelRatio);
-    const width = Math.floor(canvas.clientWidth * window.devicePixelRatio);
-    // const height = Math.floor(
-    //   window.innerHeight * 0.4 * window.devicePixelRatio,
-    // );
-    const height = Math.floor(canvas.clientHeight * window.devicePixelRatio);
+    await renderer.onSurfaceCreated();
+    const canvas = this.mWorldView;
+    const bb = canvas.getBoundingClientRect();
+    const width = Math.floor(bb.width * MainActivity.devicePixelRatio);
+    const height = Math.floor(bb.height * MainActivity.devicePixelRatio);
+
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+
     renderer.onSurfaceChanged(gl, width, height);
     this.motionEvent = new MotionEvent(this.mWorldView);
     this.mController = new Controller();
@@ -53,73 +57,62 @@ export class MainActivity {
     Tool.getTool(ToolType.WATER).setColor(this.getColor(0xff63cee4));
     this.select(ToolType.WATER);
 
-    /**
-     * @todo
-     * Throttle resize listener
-     */
-    window.addEventListener('resize', () =>
-      renderer.onSurfaceChanged(
-        gl,
-        Math.floor(canvas.clientWidth * window.devicePixelRatio),
-        Math.floor(canvas.clientHeight * window.devicePixelRatio),
-      ),
-    );
-
-    document.getElementById('play').addEventListener('click', () => {
-      Renderer.getInstance().startSimulation();
-    });
-    document.getElementById('pause').addEventListener('click', () => {
-      Renderer.getInstance().pauseSimulation();
-    });
-    document.getElementById('reset').addEventListener('click', () => {
-      Renderer.getInstance().reset();
-      this.mController.reset();
-    });
-
-    document.getElementById('info').addEventListener('change', evt => {
-      const target = evt.target as HTMLInputElement;
-      switch (target.value) {
-        case 'stats':
-          state.set('stats', target.checked);
-          break;
-        case 'debug':
-          Renderer.DEBUG_DRAW = target.checked;
-          break;
-        case 'blur':
-          state.set('blur', target.checked);
-          break;
-      }
-    });
-
-    document.getElementById('tools').addEventListener('change', evt => {
-      switch ((evt.target as HTMLInputElement).value.toUpperCase()) {
-        case 'WATER':
-          this.select(ToolType.WATER);
-          break;
-        case 'RIGID':
-          this.select(ToolType.RIGID);
-          break;
-      }
-    });
-    document.getElementById('colors').addEventListener('change', evt => {
-      const checked: HTMLInputElement = document
-        .getElementById('tools')
-        .querySelector(':checked');
-      let tool;
-      switch (checked.value.toUpperCase()) {
-        case 'WATER':
-          tool = Tool.getTool(ToolType.WATER);
-          break;
-        case 'RIGID':
-          tool = Tool.getTool(ToolType.RIGID);
-          break;
-      }
-      tool.setColor(
-        this.getColor(parseInt((evt.target as HTMLInputElement).value, 16)),
-      );
-    });
-
     renderer.onDrawFrame();
+  }
+
+  public onEvent(
+    name: string,
+    checked?: boolean,
+    color?: number,
+    data?: any,
+  ): void {
+    switch (name) {
+      case 'play':
+        Renderer.getInstance().startSimulation();
+        break;
+      case 'pause':
+        Renderer.getInstance().pauseSimulation();
+        break;
+      case 'reset':
+        Renderer.getInstance().reset();
+        this.mController.reset();
+        break;
+      case 'stats':
+        state.set('stats', checked);
+        break;
+      case 'debug':
+        Renderer.DEBUG_DRAW = checked;
+        break;
+      case 'blur':
+        state.set('blur', checked);
+        break;
+      case 'WATER':
+        this.select(ToolType.WATER);
+        if (color) {
+          Tool.getTool(ToolType.WATER).setColor(this.getColor(color));
+        }
+        break;
+      case 'RIGID':
+        this.select(ToolType.RIGID);
+        if (color) {
+          Tool.getTool(ToolType.RIGID).setColor(this.getColor(color));
+        }
+        break;
+      case 'resize':
+        if (
+          this.mWorldView.width !== data.width ||
+          this.mWorldView.height !== data.height
+        ) {
+          this.mWorldView.width = data.width;
+          this.mWorldView.height = data.height;
+        }
+
+        Renderer.getInstance().onSurfaceChanged(
+          state.get('context') as WebGLRenderingContext,
+          data.width,
+          data.height,
+        );
+    }
   }
 
   getColor(color: number): number {
