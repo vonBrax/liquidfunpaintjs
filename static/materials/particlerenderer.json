@@ -1,6 +1,6 @@
 {
   "waterParticlePointSprite": {
-      "uDiffuseTexture": "textures/particle_blurred.png",
+      "uDiffuseTexture": "textures/particle_blurred-pre.png",
       "particleSizeScale" : 2.5,
       "weightScale": 0.05,
       "weightRangeShift": 0.8,
@@ -10,7 +10,7 @@
       "alphaThreshold": 0.7
   },
   "otherParticlePointSprite": {
-      "uDiffuseTexture": "textures/particle_brush.png",
+      "uDiffuseTexture": "textures/particle_brush-pre.png",
       "particleSizeScale" : 3.2
   },
   "otherParticleToScreen": {
