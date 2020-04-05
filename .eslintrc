@@ -37,5 +37,5 @@
   "rules": {
     "no-console": 0
   },
-  "ignorePatterns": ["lf_core.js", "a.out.js", "*.wasm"]
+  "ignorePatterns": ["liquidfun/"]
 }
