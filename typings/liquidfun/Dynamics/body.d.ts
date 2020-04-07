@@ -1,10 +1,11 @@
+declare namespace LiquidFun {
 /**
  * The body type.
  * static: zero mass, zero velocity, may be manually moved
  * kinematic: zero mass, non-zero velocity set by user, moved by solver
  * dynamic: positive mass, non-zero velocity determined by forces, moved by solver
  */
-declare enum BodyType {
+export enum BodyType {
   staticBody = 0,
   kinematicBody,
   dynamicBody,
@@ -17,7 +18,7 @@ declare enum BodyType {
  * A body definition holds all the data needed to construct a rigid body.
  * You can safely re-use body definitions. Shapes are added to a body after construction.
  */
-declare class BodyDef implements ClassHandle<BodyDef> {
+export class BodyDef implements ClassHandle<BodyDef> {
   /**
    * Modified class declaration for embind:
    */
@@ -87,7 +88,7 @@ declare class BodyDef implements ClassHandle<BodyDef> {
 /**
  * A rigid body. These are created via b2World::CreateBody.
  */
-declare class Body implements ClassHandle<Body> {
+export class Body implements ClassHandle<Body> {
   /**
    * Modified class declaration for embind:
    */
@@ -531,4 +532,5 @@ declare class Body implements ClassHandle<Body> {
   private ShouldCollide(other: Body): boolean;
 
   private Advance(t: number): void;
+}
 }

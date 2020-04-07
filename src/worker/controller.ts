@@ -1,7 +1,6 @@
 // import { Renderer } from '../worker/renderer';
 import { ToolType, Tool } from './tool/tool';
 import { MotionEvent } from './motion-event';
-import { DeviceMotionEventAcceleration } from '../common/types';
 import { Renderer } from './renderer';
 
 enum Surface {
@@ -75,7 +74,7 @@ export class Controller {
 
   public onSensorChanged(e: DeviceMotionEventAcceleration): void {
     // if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-    const world: World = Renderer.getInstance().acquireWorld();
+    const world: LiquidFun.World = Renderer.getInstance().acquireWorld();
 
     try {
       const gravity = new Module.Vec2(

@@ -83,7 +83,7 @@ export class PointerInfo {
    * this pointer id.
    */
   private mNewPointer = true;
-  private mGroup: ParticleGroup = null;
+  private mGroup: LiquidFun.ParticleGroup = null;
   private mWorldPoint: Vector2f = null;
   private mBufferBlockStart = -1;
   private mBufferBlockCurrent = -1;
@@ -112,11 +112,11 @@ export class PointerInfo {
     return this.mPointerId;
   }
 
-  getParticleGroup(): ParticleGroup {
+  getParticleGroup(): LiquidFun.ParticleGroup {
     return this.mGroup;
   }
 
-  setParticleGroup(pGroup: ParticleGroup): void {
+  setParticleGroup(pGroup: LiquidFun.ParticleGroup): void {
     this.mGroup = pGroup;
   }
 

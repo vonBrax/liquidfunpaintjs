@@ -1,22 +1,24 @@
-/**
- * Delegate of b2World.
- */
-declare class ContactManager {
-  broadPhase: BroadPhase;
-  contactList: Contact;
-  contactCount: number;
-  contactFilter: ContactFilter;
-  contactListener: ContactListener;
-  allocator: BlockAllocator;
+declare namespace LiquidFun {
+  /**
+   * Delegate of b2World.
+   */
+  export class ContactManager {
+    broadPhase: BroadPhase;
+    contactList: Contact;
+    contactCount: number;
+    contactFilter: ContactFilter;
+    contactListener: ContactListener;
+    allocator: BlockAllocator;
 
-  constructor();
+    constructor();
 
-  // Broad-phase callback.
-  AddPair(proxyUserDataA: void, proxyUserDataB: void): void;
+    // Broad-phase callback.
+    AddPair(proxyUserDataA: void, proxyUserDataB: void): void;
 
-  FindNewContacts(): void;
+    FindNewContacts(): void;
 
-  Destroy(c: Contact): void;
+    Destroy(c: Contact): void;
 
-  Collide(): void;
+    Collide(): void;
+  }
 }

@@ -1,54 +1,56 @@
-declare class RopeDef {
-  vertices: Vec2;
+declare namespace LiquidFun {
+  export class RopeDef {
+    vertices: Vec2;
 
-  count: number;
+    count: number;
 
-  masses: number;
+    masses: number;
 
-  gravity: Vec2;
+    gravity: Vec2;
 
-  damping: number;
+    damping: number;
 
-  // Stretching stiffness
-  k2: number;
+    // Stretching stiffness
+    k2: number;
 
-  // Bending stiffness. Values above 0.5 can make the simulation blow up.
-  k3: number;
+    // Bending stiffness. Values above 0.5 can make the simulation blow up.
+    k3: number;
 
-  constructor();
-}
+    constructor();
+  }
 
-declare class Rope {
-  private SolveC2(): void;
-  private SolveC3(): void;
+  export class Rope {
+    private SolveC2(): void;
+    private SolveC3(): void;
 
-  private count: number;
-  private ps: Vec2;
-  private p0s: Vec2;
-  private vs: Vec2;
+    private count: number;
+    private ps: Vec2;
+    private p0s: Vec2;
+    private vs: Vec2;
 
-  private ims: number;
+    private ims: number;
 
-  private Ls: number;
-  private as: number;
+    private Ls: number;
+    private as: number;
 
-  private gravity: Vec2;
-  private damping: number;
+    private gravity: Vec2;
+    private damping: number;
 
-  private k2: number;
-  private k3: number;
+    private k2: number;
+    private k3: number;
 
-  constructor();
+    constructor();
 
-  Initialize(def: RopeDef): void;
+    Initialize(def: RopeDef): void;
 
-  Step(timeStep: number, iterations: number): void;
+    Step(timeStep: number, iterations: number): void;
 
-  GetVertexCount(): number;
+    GetVertexCount(): number;
 
-  GetVertices(): Vec2;
+    GetVertices(): Vec2;
 
-  Draw(draw: Draw): void;
+    Draw(draw: Draw): void;
 
-  SetAngle(angle: number): void;
+    SetAngle(angle: number): void;
+  }
 }

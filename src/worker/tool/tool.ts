@@ -123,7 +123,7 @@ export abstract class Tool {
   ]);
 
   // member native (C++) variables
-  protected mColor: ParticleColor = new Module.ParticleColor();
+  protected mColor: LiquidFun.ParticleColor = new Module.ParticleColor();
   protected mVelocity: Vec2 = new Module.Vec2(0, 0);
 
   // This variable is a temporary variable to allow us to destroy particles.
@@ -396,7 +396,7 @@ export abstract class Tool {
 
     const buffer: ByteBuffer = pInfo.getRawPointsBuffer();
 
-    let pgd: ParticleGroupDef = null;
+    let pgd: LiquidFun.ParticleGroupDef = null;
 
     if (this.mOperations.has(ToolOperation.ADD_PARTICLES)) {
       pgd = new Module.ParticleGroupDef();
@@ -415,7 +415,7 @@ export abstract class Tool {
       );
     }
 
-    const ps: ParticleSystem = Renderer.getInstance().acquireParticleSystem();
+    const ps: LiquidFun.ParticleSystem = Renderer.getInstance().acquireParticleSystem();
 
     try {
       if (this.mOperations.has(ToolOperation.REMOVE_PARTICLES)) {
@@ -433,8 +433,8 @@ export abstract class Tool {
       // Create ParticleGroup
       if (pgd != null) {
         // Join to existing group if the group has the same flags
-        const pGroup: ParticleGroup = ps.CreateParticleGroup(pgd);
-        const existingGroup: ParticleGroup = pInfo.getParticleGroup();
+        const pGroup: LiquidFun.ParticleGroup = ps.CreateParticleGroup(pgd);
+        const existingGroup: LiquidFun.ParticleGroup = pInfo.getParticleGroup();
 
         if (
           existingGroup == null ||

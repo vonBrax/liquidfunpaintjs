@@ -153,7 +153,7 @@ export class DebugRenderer {
     buffer.put(DebugRenderer.DEBUG_OPACITY * 255);
   }
 
-  private addColorToBuffer(buffer: ByteBuffer, color: Color): void {
+  private addColorToBuffer(buffer: ByteBuffer, color: LiquidFun.Color): void {
     this._addColorToBuffer(buffer, color.r, color.g, color.b);
   }
 
@@ -162,7 +162,7 @@ export class DebugRenderer {
     // vertices: number[],
     vertices: Vec2[] | number | TypedArray,
     vertexCount: number,
-    color: Color,
+    color: LiquidFun.Color,
   ): void {
     console.assert(vertexCount === 4, 'Invalid vertexCount, investigate');
     // This is equivalent to drawing lines with the same color at each
@@ -237,7 +237,7 @@ export class DebugRenderer {
   public DrawSolidPolygon(
     vertices: Vec2[] | number | TypedArray,
     vertexCount: number,
-    color: Color,
+    color: LiquidFun.Color,
   ): void {
     console.assert(vertexCount === 4, 'Invalid vertexCount, investigate.');
     if (!Array.isArray(vertices)) {
@@ -299,7 +299,11 @@ export class DebugRenderer {
   }
 
   // @Override
-  public DrawCircle(center: Vec2, radius: number, color: Color): void {
+  public DrawCircle(
+    center: Vec2,
+    radius: number,
+    color: LiquidFun.Color,
+  ): void {
     this.mCirclePositionBuffer.putFloat(center.x);
     this.mCirclePositionBuffer.putFloat(center.y);
 
@@ -324,7 +328,7 @@ export class DebugRenderer {
     center: Vec2,
     radius: number,
     axis: Vec2,
-    color: Color,
+    color: LiquidFun.Color,
   ): void {
     this.DrawCircle(center, radius, color);
 
@@ -345,7 +349,7 @@ export class DebugRenderer {
   public DrawParticles(
     centers: Vec2[] | number | TypedArray,
     radius: number,
-    colors: ParticleColor[] | number | TypedArray,
+    colors: LiquidFun.ParticleColor[] | number | TypedArray,
     count: number,
   ): void {
     if (!Array.isArray(centers) || !Array.isArray(colors)) {
@@ -396,7 +400,7 @@ export class DebugRenderer {
   }
 
   // @Override
-  public DrawSegment(p1: Vec2, p2: Vec2, color: Color): void {
+  public DrawSegment(p1: Vec2, p2: Vec2, color: LiquidFun.Color): void {
     const { r, g, b } = color;
 
     this.addSegmentPoint(p1.x, p1.y, r, g, b);
@@ -433,7 +437,7 @@ export class DebugRenderer {
   }
 
   public draw(): void {
-    const world: World = Renderer.getInstance().acquireWorld();
+    const world: LiquidFun.World = Renderer.getInstance().acquireWorld();
     try {
       this.resetAllBuffers();
 

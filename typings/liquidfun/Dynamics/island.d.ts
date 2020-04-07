@@ -1,49 +1,52 @@
-/**
- * This is an internal class.
- */
-declare class Island {
-  allocator: StackAllocator;
-  listener: ContactListener;
+declare namespace LiquidFun {
 
-  bodies: Body;
-  contacts: Contact;
-  joints: Joint;
+  /**
+   * This is an internal class.
+   */
+  export class Island {
+    allocator: StackAllocator;
+    listener: ContactListener;
 
-  positions: Position;
-  velocities: Velocity;
+    bodies: Body;
+    contacts: Contact;
+    joints: Joint;
 
-  bodyCount: number;
-  jointCount: number;
-  contactCount: number;
+    positions: Position;
+    velocities: Velocity;
 
-  bodyCapacity: number;
-  contactCapacity: number;
-  jointCapacity: number;
+    bodyCount: number;
+    jointCount: number;
+    contactCount: number;
 
-  constructor(
-    bodyCapacity: number,
-    contactCapacity: number,
-    jointCapacity: number,
-    allocator: StackAllocator,
-    listener: ContactListener,
-  );
+    bodyCapacity: number;
+    contactCapacity: number;
+    jointCapacity: number;
 
-  Clear(): void;
+    constructor(
+      bodyCapacity: number,
+      contactCapacity: number,
+      jointCapacity: number,
+      allocator: StackAllocator,
+      listener: ContactListener,
+    );
 
-  Solve(
-    profile: Profile,
-    step: TimeStep,
-    gravity: Vec2,
-    allowSleep: boolean,
-  ): void;
+    Clear(): void;
 
-  SolveTOI(subStep: TimeStep, toiIndexA: number, toiIndexB: number): void;
+    Solve(
+      profile: Profile,
+      step: TimeStep,
+      gravity: Vec2,
+      allowSleep: boolean,
+    ): void;
 
-  Add(body: Body): void;
+    SolveTOI(subStep: TimeStep, toiIndexA: number, toiIndexB: number): void;
 
-  Add(contact: Contact): void;
+    Add(body: Body): void;
 
-  Add(joint: Joint): void;
+    Add(contact: Contact): void;
 
-  Report(constraints: ContactVelocityConstraint): void;
+    Add(joint: Joint): void;
+
+    Report(constraints: ContactVelocityConstraint): void;
+  }
 }

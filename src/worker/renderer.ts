@@ -51,9 +51,9 @@ export class Renderer {
   public sScreenHeight = 1;
 
   // Renderer class owns all Box2D objects, for thread-safety
-  private mWorld: World = null;
-  private mParticleSystem: ParticleSystem = null;
-  private mBoundaryBody: Body = null;
+  private mWorld: LiquidFun.World = null;
+  private mParticleSystem: LiquidFun.ParticleSystem = null;
+  private mBoundaryBody: LiquidFun.Body = null;
 
   // Variables for thread synchronization
   private mSimulation = false;
@@ -269,7 +269,7 @@ export class Renderer {
 
       this.mParticleRenderer.update(dt);
 
-      const world: World = this.acquireWorld();
+      const world: LiquidFun.World = this.acquireWorld();
       try {
         world.Step(
           dt,
@@ -311,7 +311,7 @@ export class Renderer {
   }
 
   private deleteWorld(): void {
-    const world: World = this.acquireWorld();
+    const world: LiquidFun.World = this.acquireWorld();
 
     try {
       if (this.mBoundaryBody != null) {
@@ -357,7 +357,7 @@ export class Renderer {
     this.acquireWorld();
     try {
       // Create a new particle system; we only use one.
-      const psDef: ParticleSystemDef = new Module.ParticleSystemDef();
+      const psDef: LiquidFun.ParticleSystemDef = new Module.ParticleSystemDef();
       psDef.radius = Renderer.PARTICLE_RADIUS;
       psDef.maxCount = Renderer.MAX_PARTICLE_COUNT;
       psDef.repulsiveStrength = Renderer.PARTICLE_REPULSIVE_STRENGTH;
@@ -370,7 +370,7 @@ export class Renderer {
 
   /** Constructs boundaries for the canvas. **/
   private initBoundaries(): void {
-    const world: World = this.acquireWorld();
+    const world: LiquidFun.World = this.acquireWorld();
 
     try {
       // clean up previous Body if exists
@@ -379,7 +379,7 @@ export class Renderer {
       }
 
       // Create native objects
-      const bodyDef: BodyDef = new Module.BodyDef();
+      const bodyDef: LiquidFun.BodyDef = new Module.BodyDef();
       const boundaryPolygon: PolygonShape = new Module.PolygonShape();
       this.mBoundaryBody = world.CreateBody(bodyDef);
 
@@ -454,7 +454,7 @@ export class Renderer {
   /**
    * Acquire the world for thread-safe operations.
    */
-  public acquireWorld(): World {
+  public acquireWorld(): LiquidFun.World {
     /**
      * @todo: Threads and thread locks dont
      * make sense in JS. See if makes sense
@@ -479,7 +479,7 @@ export class Renderer {
    * don't want to call ParticleSystem.createParticleGroup() at the same
    * time.
    */
-  public acquireParticleSystem(): ParticleSystem {
+  public acquireParticleSystem(): LiquidFun.ParticleSystem {
     // this.mWorldLock.lock();
     return this.mParticleSystem;
   }

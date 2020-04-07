@@ -1,7 +1,6 @@
 import { mat3, vec2 } from 'gl-matrix';
 import { state } from '../state';
 import { FileHelper } from '../util/file-helper';
-import { HTMLImageElement } from '../../common/types';
 
 // function isPowerOf2(value: number): boolean {
 //   return (value & (value - 1)) == 0;
@@ -201,14 +200,6 @@ export class Texture {
     const gl: WebGLRenderingContext = state.get(
       'context',
     ) as WebGLRenderingContext;
-
-    /**
-     *  "types": [
-      "../../node_modules/@types/emscripten",
-      "../../typings/emscripten",
-      "../../typings/liquidfun"
-    ]
-     */
 
     // Set texture properties
     this.mWidth = bitmap.naturalWidth || bitmap.width;

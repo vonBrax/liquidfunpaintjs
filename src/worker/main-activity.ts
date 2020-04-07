@@ -7,8 +7,6 @@ import { RigidTool } from '../worker/tool/rigid-tool';
 import { MotionEvent, OnTouchListener } from '../worker/motion-event';
 import { Controller } from '../worker/controller';
 
-import { HTMLCanvasElement } from '../common/types';
-
 interface CustomMessageData {
   type: string;
   checked?: boolean;

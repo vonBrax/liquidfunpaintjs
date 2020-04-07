@@ -1,6 +1,5 @@
 // import { MainActivity } from '../worker/main-activity';
 // import { throttle } from '../util/functionsHelper';
-import { HTMLCanvasElement, PointerEvent } from '../common/types';
 
 interface EventHistory {
   byIndex: Map<number, PointerEvent[]>;

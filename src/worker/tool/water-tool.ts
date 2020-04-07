@@ -7,7 +7,7 @@ import { PointerInfo } from './pointer-info';
  * Particle groups are merely used to mimic the shape of a stroke.
  */
 export class WaterTool extends Tool {
-  private mParticleGroup: ParticleGroup = null;
+  private mParticleGroup: LiquidFun.ParticleGroup = null;
 
   constructor() {
     super(ToolType.WATER);

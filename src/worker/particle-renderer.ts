@@ -49,7 +49,7 @@ export class ParticleRenderer {
   private mParticlePositionBuffer: ByteBuffer;
   private mParticleWeightBuffer: ByteBuffer;
 
-  private mParticleRenderList: ParticleGroup[] = Array(256);
+  private mParticleRenderList: LiquidFun.ParticleGroup[] = Array(256);
 
   constructor() {
     this.mParticlePositionBuffer = new ByteBuffer(
@@ -88,7 +88,7 @@ export class ParticleRenderer {
     this.mParticleWeightBuffer.rewind();
     this.mParticleRenderList = [];
 
-    const ps: ParticleSystem = Renderer.getInstance().acquireParticleSystem();
+    const ps: LiquidFun.ParticleSystem = Renderer.getInstance().acquireParticleSystem();
 
     try {
       const gl: WebGL2RenderingContext = state.get(
@@ -171,7 +171,7 @@ export class ParticleRenderer {
   /**
    * Issue the correct draw call for the ParticleGroup that is passed in.
    */
-  private drawParticleGroup(pg: ParticleGroup): void {
+  private drawParticleGroup(pg: LiquidFun.ParticleGroup): void {
     // Get the buffer offsets
     const instanceOffset = pg.GetBufferIndex();
     const particleCount = pg.GetParticleCount();
@@ -251,9 +251,9 @@ export class ParticleRenderer {
     );
 
     // Go through each particle group
-    const ps: ParticleSystem = Renderer.getInstance().acquireParticleSystem();
+    const ps: LiquidFun.ParticleSystem = Renderer.getInstance().acquireParticleSystem();
     try {
-      let currGroup: ParticleGroup = ps.GetParticleGroupList();
+      let currGroup: LiquidFun.ParticleGroup = ps.GetParticleGroupList();
 
       while (currGroup != null) {
         // Only draw water particles in this pass; queue other groups
