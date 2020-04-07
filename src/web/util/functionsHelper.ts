@@ -27,6 +27,8 @@
 //   }
 // }
 
+declare let window: Window;
+
 export class Log {
   public static e(tag: string, message: string): void {
     console.log(`%c [${tag}] - ${message}`, 'color: red');
@@ -36,7 +38,26 @@ export class Log {
   }
 }
 
-export function getMousePosition(evt: PointerEvent): any {
+interface MouseCoordinates {
+  x: number;
+  y: number;
+}
+
+interface RelativeMousePosition {
+  /** Relative to the viewport */
+  client: MouseCoordinates;
+
+  /** Relative to the physical screen */
+  screen: MouseCoordinates;
+
+  /** Relative to the event target */
+  offset: MouseCoordinates;
+
+  /** Relative to the html document */
+  page: MouseCoordinates;
+}
+
+export function getMousePosition(evt: PointerEvent): RelativeMousePosition {
   let pageX = evt.pageX;
   let pageY = evt.pageY;
   if (pageX === undefined) {
@@ -62,6 +83,7 @@ export function getMousePosition(evt: PointerEvent): any {
   };
 }
 
+/*
 interface DebounceOptions {
   leading?: boolean;
   maxWait?: number;
@@ -72,7 +94,7 @@ interface DebounceOptions {
 export function debounce(
   func: () => {},
   wait = 0,
-  options?: DebounceOptions,
+  options: DebounceOptions = {},
 ): any {
   const leading = !!options.leading;
   const maxing = 'maxWait' in options;
@@ -101,8 +123,8 @@ export function debounce(
 
   function startTimer(pendingFunc: () => {}, wait: number): number {
     if (useRAF) {
-      window.cancelAnimationFrame(timerId);
-      return window.requestAnimationFrame(pendingFunc);
+      cancelAnimationFrame(timerId);
+      return requestAnimationFrame(pendingFunc);
     }
 
     return window.setTimeout(pendingFunc, wait);
@@ -110,7 +132,7 @@ export function debounce(
 
   function cancelTimer(id: number): void {
     if (useRAF) {
-      return window.cancelAnimationFrame(id);
+      return cancelAnimationFrame(id);
     }
     clearTimeout(id);
   }
@@ -232,3 +254,4 @@ export function throttle(
 
   return debounce(func, wait, { leading, trailing, maxWait: wait });
 }
+*/

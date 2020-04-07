@@ -3,9 +3,9 @@ import { ShaderProgram } from './shader-program';
 import { Texture } from './texture';
 import { Renderer } from '../renderer';
 import { ParticleRenderer } from '../particle-renderer';
-import { Log } from '../util/functionsHelper';
+import { Log } from '../util/log';
 import { state } from '../state';
-import { JSONObject } from '../util/types';
+import { JSONObject } from '../../common/types';
 
 /**
  * ParticleMaterial.
@@ -21,7 +21,7 @@ export class ParticleMaterial extends Material {
     super(new ShaderProgram('particle.glslv', 'particle.glslf'));
 
     // Read in values from the JSON file
-    this.mParticleSizeScale = +json.particleSizeScale || 1.0;
+    this.mParticleSizeScale = Number(json.particleSizeScale || 1.0);
 
     // Add the water texture that is scrolling
     try {

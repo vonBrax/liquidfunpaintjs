@@ -1,0 +1,13 @@
+{
+  "extends": "../../generic-tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "es2020",
+      "dom"
+    ]
+  },
+  "references": [
+    { "path": "../worker" },
+    { "path": "../common" }
+  ]
+}

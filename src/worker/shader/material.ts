@@ -1,6 +1,6 @@
 import { ShaderProgram } from './shader-program';
 import { Texture } from './texture';
-import { Log } from '../util/functionsHelper';
+import { Log } from '../util/log';
 import { state } from '../state';
 
 /**

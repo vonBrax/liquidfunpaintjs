@@ -1,6 +1,7 @@
 import { mat3, vec2 } from 'gl-matrix';
-import { FileHelper } from '../util/file-helper';
 import { state } from '../state';
+import { FileHelper } from '../util/file-helper';
+import { HTMLImageElement } from '../../common/types';
 
 // function isPowerOf2(value: number): boolean {
 //   return (value & (value - 1)) == 0;
@@ -132,7 +133,7 @@ export class Texture {
       } else if (assetName) {
         this.mName = assetName;
         this.generateTexture();
-        FileHelper.loadBitmap(assetName).then(bitmap =>
+        FileHelper.loadBitmap(assetName).then((bitmap) =>
           this.loadTexture(bitmap, scale, wrapS, wrapT),
         );
       }
@@ -182,7 +183,6 @@ export class Texture {
     // Load texture
     // this.loadTexture(bitmap, scale, wrapS, wrapT);
     // bitmap.recycle();
-
     // console.log('%c LOADING TEXTURE NEEDS FIX', 'color: red');
     // console.log({ resourceId, scale, wrapS, wrapT });
   }
@@ -198,16 +198,31 @@ export class Texture {
     wrapS: WrapParam,
     wrapT: WrapParam,
   ): void {
-    const gl: WebGL2RenderingContext = state.get(
+    const gl: WebGLRenderingContext = state.get(
       'context',
-    ) as WebGL2RenderingContext;
+    ) as WebGLRenderingContext;
+
+    /**
+     *  "types": [
+      "../../node_modules/@types/emscripten",
+      "../../typings/emscripten",
+      "../../typings/liquidfun"
+    ]
+     */
 
     // Set texture properties
     this.mWidth = bitmap.naturalWidth || bitmap.width;
     this.mHeight = bitmap.naturalHeight || bitmap.height;
 
     gl.bindTexture(gl.TEXTURE_2D, this.mTextureId[0]);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmap);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      (bitmap as unknown) as ImageBitmap,
+    );
 
     // WebGL1 has different requirements for power of 2 images
     // vs non power of 2 images so check if the image is a

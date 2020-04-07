@@ -269,6 +269,7 @@ function WebGLClient() {
     80: { name: 'drawBuffersWEBGL', func: func1 },
     81: { name: 'uniform1iv', func: uniform1iv },
     82: { name: 'uniform1fv', func: uniform1fv },
+    83: { name: 'flush', func: func0 },
   };
 
   function renderCommands(buf) {
@@ -326,7 +327,7 @@ WebGLClient.prefetch = function() {
     // If we have no webGL support, we still notify that prefetching is done, as the app blocks on that
     worker.postMessage({ target: 'gl', op: 'setPrefetched', preMain: true });
     return;
-  } 
+  }
 
   // Fetch the parameters and proxy them
   var parameters = {};
@@ -769,8 +770,26 @@ function shouldPreventDefault(event) {
   }
 };
 
-['pointerdown', 'pointermove', 'pointerup', 'pointercancel'].forEach(function(event) {
-  Module.canvas.addEventListener(event, function(event) {
-    worker.postMessage({ target: 'canvas', event: cloneObject(event) });
-  }, false);
-});
+function pipeCanvasEvents(events, callback) {
+  if (!events) {
+    return;
+  }
+  if (!Array.isArray(events)) {
+    events = [ events ];
+  }
+
+  events.forEach(function(event) {
+    Module.canvas.addEventListener(event, function(ev) {
+      if (typeof callback === 'function') {
+        callback(ev);
+      }
+      worker.postMessage({ target: 'canvas', event: cloneObject(ev)});
+    }, false);
+  });
+}
+
+// ['pointerdown', 'pointermove', 'pointerup', 'pointercancel'].forEach(function(event) {
+//   Module.canvas.addEventListener(event, function(event) {
+//     worker.postMessage({ target: 'canvas', event: cloneObject(event) });
+//   }, false);
+// });

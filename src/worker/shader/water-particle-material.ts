@@ -1,9 +1,9 @@
-import { Log } from '../util/functionsHelper';
+import { Log } from '../util/log';
 import { Material } from './material';
 import { ShaderProgram } from './shader-program';
 import { Texture } from './texture';
 import { state } from '../state';
-import { JSONObject } from '../util/types';
+import { JSONObject } from '../../common/types';
 import { ParticleRenderer } from '../particle-renderer';
 import { Renderer } from '../renderer';
 
@@ -43,20 +43,20 @@ export class WaterParticleMaterial extends Material {
     super(new ShaderProgram('water_particle.glslv', 'particle.glslf'));
 
     // Read in values from the JSON file
-    this.mParticleSizeScale = +json.particleSizeScale || 1.0;
+    this.mParticleSizeScale = Number(json.particleSizeScale || 1.0);
 
     // Scale of weight. This changes values from [0.0, max) to
     // [0.0, max*scale).
-    this.mWeightParams[0] = +json.weightScale || 1.0;
+    this.mWeightParams[0] = Number(json.weightScale || 1.0);
 
     // Range shift. This shifts values from [0.0, max) to
     // [range shift, max + range shift), so we take into account particles
     // with a small weight for a smoother curve.
-    this.mWeightParams[1] = +json.weightRangeShift || 0.0;
+    this.mWeightParams[1] = Number(json.weightRangeShift || 0.0);
 
     // Cutoff. This means particles with a weight less than the cutoff
     // will not have any weight applied.
-    this.mWeightParams[2] = +json.weightCutoff || 1.0;
+    this.mWeightParams[2] = Number(json.weightCutoff || 1.0);
 
     // Add the water texture that is scrolling
     try {
@@ -78,27 +78,58 @@ export class WaterParticleMaterial extends Material {
   public beginRender(): void {
     super.beginRender();
 
-    const gl: WebGL2RenderingContext = state.get(
+    const gl: WebGLRenderingContext = state.get(
       'context',
-    ) as WebGL2RenderingContext;
+    ) as WebGLRenderingContext;
 
     const max = Math.max(
       Renderer.getInstance().sRenderWorldWidth,
       Renderer.getInstance().sRenderWorldHeight,
     );
+    // const width = Renderer.getInstance().sRenderWorldWidth;
+    // const height = Renderer.getInstance().sRenderWorldHeight;
+
+    // let ratio;
+    // if (width < height) {
+    //   ratio = height / width;
+    // } else {
+    //   ratio = width / height;
+    // }
+    const num =
+      this.mParticleSizeScale *
+      ParticleRenderer.FB_SIZE *
+      Renderer.PARTICLE_RADIUS;
 
     // Specific uniforms to this material
+    // gl.uniform1f(
+    //   this.getUniformLocation('uPointSize'),
+    //   Math.max(
+    //     1.0,
+    //     (this.mParticleSizeScale *
+    //       ParticleRenderer.FB_SIZE *
+    //       Renderer.PARTICLE_RADIUS) /
+    //       // Renderer.getInstance().sRenderWorldHeight
+    //       max,
+    //   ),
+    // );
+
+    // console.log(num / max);
+
     gl.uniform1f(
       this.getUniformLocation('uPointSize'),
-      Math.max(
-        1.0,
-        this.mParticleSizeScale *
-          ParticleRenderer.FB_SIZE *
-          (Renderer.PARTICLE_RADIUS /
-            // Renderer.getInstance().sRenderWorldHeight
-            max),
-      ),
+      Math.max(1.0, (num * 1.5) / max),
     );
+
+    // gl.uniform1f(
+    //   this.getUniformLocation('uPointSize'),
+    //   Math.max(
+    //     1.0,
+    //     this.mParticleSizeScale *
+    //       ParticleRenderer.FB_SIZE *
+    //       Renderer.PARTICLE_RADIUS *
+    //       ratio,
+    //   ),
+    // );
     gl.uniform3fv(
       this.getUniformLocation('uWeightParams'),
       new Float32Array(this.mWeightParams),

@@ -1,7 +1,7 @@
 import { PointerInfo } from './pointer-info';
 import { Vector2f } from '../util/vector2f';
 import { Renderer } from '../renderer';
-import { MotionEvent } from './motion-event';
+import { MotionEvent } from '../motion-event';
 import { ByteBuffer } from '../util/byte-buffer';
 
 /**

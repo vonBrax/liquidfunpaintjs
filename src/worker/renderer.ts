@@ -5,6 +5,8 @@ import { DebugRenderer } from './debug-renderer';
 import { TextureRenderer } from './texture-renderer';
 import { state } from './state';
 import { AssetManager } from './util/asset-manager';
+import { MainActivity } from './main-activity';
+// import {} from '../util/types';
 
 function createMatrix(): mat4 {
   const m4 = mat4.create();
@@ -25,7 +27,8 @@ export class Renderer {
   private static _instance: Renderer = new Renderer();
   private static TAG = 'Renderer';
   private static ONE_SEC = 1000000000;
-  private static WORLD_HEIGHT = 3.0;
+  // private static WORLD_HEIGHT = 3.0;
+  private static WORLD_HEIGHT = 6.0;
   public static MAX_PARTICLE_COUNT = 5000;
   public static PARTICLE_RADIUS = 0.06;
   public static PARTICLE_REPULSIVE_STRENGTH = 0.5;
@@ -91,8 +94,7 @@ export class Renderer {
 
   public init(): void {
     // Adjust world height based on pixel density
-    // Renderer.WORLD_HEIGHT /= window.devicePixelRatio;
-    Renderer.WORLD_HEIGHT /= 1;
+    Renderer.WORLD_HEIGHT /= MainActivity.devicePixelRatio;
 
     // TS does not seem to initialize class properties
     // pointing to other static property
@@ -144,14 +146,14 @@ export class Renderer {
 
     this.reset();
 
-    this.mTime = window.performance.now() * 1000000;
+    this.mTime = self.performance.now() * 1000000;
   }
 
   // Override
   public onDrawFrame(/* GL10 */): void {
     // Show the frame rate
     if (state.get('stats')) {
-      const time = window.performance.now() * 1000000;
+      const time = self.performance.now() * 1000000;
 
       if (time - this.mTime > Renderer.ONE_SEC) {
         if (this.totalFrames < 0) {
@@ -174,7 +176,11 @@ export class Renderer {
           ${this.mParticleSystem.GetParticleGroupCount()} particle groups
           ${this.mWorld.GetBodyCount()} bodies
         `;
-        postCustomMessage({ type: 'log', value: msg });
+        // postCustomMessage({ type: 'log', value: msg });
+        postMessage({
+          target: 'custom',
+          userData: { type: 'log', value: msg },
+        });
       }
       this.mFrames++;
       this.totalFrames++;

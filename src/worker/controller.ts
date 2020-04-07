@@ -1,6 +1,8 @@
-import { Renderer } from './renderer';
+// import { Renderer } from '../worker/renderer';
 import { ToolType, Tool } from './tool/tool';
-import { MotionEvent } from './tool/motion-event';
+import { MotionEvent } from './motion-event';
+import { DeviceMotionEventAcceleration } from '../common/types';
+import { Renderer } from './renderer';
 
 enum Surface {
   ROTATION_0 = 0,
@@ -20,9 +22,9 @@ class Device {
  */
 export class Controller {
   // private mManager: SensorManager;
-  private mManager: any;
+  // private mManager: any;
   // private mAccelerometer: Sensor;
-  private mAccelerometer: any;
+  // private mAccelerometer: any;
   private mGravityVec: number[] = [0, 0];
   private mTool: Tool = null;
 
@@ -80,6 +82,9 @@ export class Controller {
         this.mGravityVec[0] * e.x - this.mGravityVec[1] * e.y,
         this.mGravityVec[1] * e.x + this.mGravityVec[0] * e.y,
       );
+      // const x = this.mGravityVec[0] * e.x - this.mGravityVec[1] * e.y;
+      // const y = this.mGravityVec[1] * e.x + this.mGravityVec[0] * e.y;
+      // postMessage({ type: 'set-gravity', x, y }, '*');
       world.SetGravity(gravity);
     } finally {
       Renderer.getInstance().releaseWorld();

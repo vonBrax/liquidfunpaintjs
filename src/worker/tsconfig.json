@@ -1,0 +1,18 @@
+{
+  "extends": "../../generic-tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "ES2020",
+      "webworker"
+    ],
+    // "types": ["emscripten", "liquidfun"]
+    // "typeRoots": [
+    //   "../../typings",
+    //   "../../node_modules/@types/emscripten",
+    //   "../../node_modules/@types/node"
+    // ]
+  },
+  "references": [
+    { "path": "../common" }
+  ]
+}

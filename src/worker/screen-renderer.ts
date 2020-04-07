@@ -1,7 +1,7 @@
 import { Material } from './shader/material';
 import { Texture } from './shader/texture';
 import { ShaderProgram } from './shader/shader-program';
-import { JSONObject } from './util/types';
+import { JSONObject } from '../common/types';
 import { RenderHelper } from './util/render-helper';
 import { state } from './state';
 import { mat4 } from 'gl-matrix';

@@ -63,7 +63,7 @@ declare class ChainShape extends Shape {
    * @param edge
    * @param index
    */
-  GetChildEdge(edge: b2EdgeShape, index: number): void;
+  GetChildEdge(edge: EdgeShape, index: number): void;
 
   /**
    * This always return false.

@@ -1,5 +1,6 @@
-import { MainActivity } from '../main-activity';
+// import { MainActivity } from '../worker/main-activity';
 // import { throttle } from '../util/functionsHelper';
+import { HTMLCanvasElement, PointerEvent } from '../common/types';
 
 interface EventHistory {
   byIndex: Map<number, PointerEvent[]>;
@@ -16,6 +17,14 @@ interface PointersCache {
   allIds: number[];
 }
 
+// interface HasTouchHandler {
+//   onTouch: (e: MotionEvent) => void;
+// }
+
+export interface OnTouchListener {
+  onTouch(event: MotionEvent): boolean;
+}
+
 export class MotionEvent {
   public static ACTION_POINTER_DOWN = 'pointerdown';
   public static ACTION_MOVE = 'pointermove';
@@ -30,7 +39,7 @@ export class MotionEvent {
     allIds: [],
   };
 
-  private history2: PointerEvent[] = [];
+  // private history2: PointerEvent[] = [];
   // private pointers: number[] = [];
   private lastEvent: PointerEvent;
   private pointers: PointersCache = {
@@ -43,7 +52,7 @@ export class MotionEvent {
   // private lastEvents: PointerEvent[] = [];
 
   private pointerDown: boolean;
-  private touchListeners: Set<MainActivity> = new Set();
+  private touchListeners: Set<OnTouchListener> = new Set();
   public container: HTMLCanvasElement;
   private containerBoundingRect: DOMRect;
   private clearPointersCache: number[] = [];
@@ -96,7 +105,7 @@ export class MotionEvent {
 
   getActionIndex(): number {
     return this.pointers.allIds.findIndex(
-      id => this.lastEvent.pointerId === id,
+      (id) => this.lastEvent.pointerId === id,
     );
     // return this.history.allIds.findIndex(
     //   id => id === this.activeEvent.pointerId,
@@ -107,13 +116,13 @@ export class MotionEvent {
     return this.pointers.allIds[pointerIndex];
   }
 
-  setOnTouchListener(listener: MainActivity): void {
+  setOnTouchListener(listener: OnTouchListener): void {
     this.addListeners();
     this.touchListeners.add(listener);
     // window.requestAnimationFrame(this.dispatchCachedEvents);
   }
 
-  deleteOnTouchListener(listener: MainActivity): void {
+  deleteOnTouchListener(listener: OnTouchListener): void {
     this.removeListeners();
     this.touchListeners.delete(listener);
   }
@@ -220,11 +229,11 @@ export class MotionEvent {
 
   private startTimer(wait: number): number {
     if (this.useRAF) {
-      window.cancelAnimationFrame(this.timerId);
-      return window.requestAnimationFrame(this.timerExpired);
+      cancelAnimationFrame(this.timerId);
+      return requestAnimationFrame(this.timerExpired);
     }
 
-    return window.setTimeout(this.timerExpired, wait);
+    return setTimeout(this.timerExpired, wait);
   }
 
   private timerExpired(): void {
@@ -283,10 +292,10 @@ export class MotionEvent {
 
   private cancelTimer(id: number): void {
     if (this.useRAF) {
-      return window.cancelAnimationFrame(id);
+      return cancelAnimationFrame(id);
     }
 
-    window.clearTimeout(id);
+    clearTimeout(id);
   }
 
   onPointerUp(event: PointerEvent): void {
@@ -312,7 +321,7 @@ export class MotionEvent {
     }
 
     if (this.clearPointersCache.length) {
-      this.clearPointersCache.forEach(id => this.clearCache(id));
+      this.clearPointersCache.forEach((id) => this.clearCache(id));
       this.clearPointersCache = [];
     }
 
@@ -329,7 +338,7 @@ export class MotionEvent {
   }
 
   dispatch(): void {
-    this.touchListeners.forEach(activity => activity.onTouch(this));
+    this.touchListeners.forEach((activity) => activity.onTouch(this));
   }
 
   private setCurrentEvent(e: PointerEvent): void {
@@ -339,7 +348,7 @@ export class MotionEvent {
       return;
     }
     const pid = this.lastEvent.pointerId;
-    let index = this.pointers.allIds.findIndex(id => id === pid);
+    let index = this.pointers.allIds.findIndex((id) => id === pid);
     if (index === -1) {
       index = this.pointers.allIds.length;
       this.pointers.allIds.push(pid);

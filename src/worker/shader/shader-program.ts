@@ -1,7 +1,7 @@
 // import shader;
 // import util.FileHelper;
 import { state } from '../state';
-import { Log } from '../util/functionsHelper';
+import { Log } from '../util/log';
 import { AssetManager } from '../util/asset-manager';
 import { FileHelper } from '../util/file-helper';
 

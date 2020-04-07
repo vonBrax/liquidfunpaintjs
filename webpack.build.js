@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   mode: 'production',
   entry: {
-    main: './src/index.ts',
+    main: './index.ts',
     worker: './src/worker/worker.ts',
   },
   module: {

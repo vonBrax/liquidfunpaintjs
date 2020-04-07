@@ -1,5 +1,5 @@
 import { Vector2f } from '../util/vector2f';
-import { Log } from '../util/functionsHelper';
+import { Log } from '../util/log';
 import { ByteBuffer } from '../util/byte-buffer';
 
 /**

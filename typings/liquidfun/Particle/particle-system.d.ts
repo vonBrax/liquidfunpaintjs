@@ -962,19 +962,19 @@ declare class ParticleSystem {
     // ps: ParticleSystem,
     startIndex: number,
     numParticles: number,
-    outBuf: Buffer | WebGLBuffer,
+    outBuf: ArrayBuffer | number, // Pointer
     size: number,
   ): number;
   CopyColorBuffer(
     startIndex: number,
     numParticles: number,
-    outBuf: Buffer | WebGLBuffer,
+    outBuf: ArrayBuffer | number, // Pointer
     size: number,
   ): number;
   CopyWeightBuffer(
     startIndex: number,
     numParticles: number,
-    outBuf: Buffer | WebGLBuffer,
+    outBuf: ArrayBuffer | number, // Pointer
     size: number,
   ): number;
 
