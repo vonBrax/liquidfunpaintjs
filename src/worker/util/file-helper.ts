@@ -4,7 +4,9 @@ export class FileHelper {
   public static async loadAsset(fileName: string): Promise<string> {
     let fileContent = null;
     try {
-      fileContent = await fetch(`/static/${fileName}`).then(res => res.text());
+      fileContent = await fetch(`/static/${fileName}`).then((res) =>
+        res.text(),
+      );
     } catch (ex) {
       console.error(ex);
       return null;
@@ -25,10 +27,10 @@ export class FileHelper {
     // return this.loadAndPreMultiplyAlpha(fileName);
     return new Promise((resolve, reject) => {
       const image = new Image();
-      image.onload = function() {
+      image.onload = function (): void {
         resolve(image);
       };
-      image.onerror = function(e) {
+      image.onerror = function (e): void {
         reject(e);
       };
       image.src = `/static/${fileName}`;
@@ -49,7 +51,7 @@ export class FileHelper {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const image = new Image();
-      image.onload = function() {
+      image.onload = function (): void {
         const w = image.naturalWidth || image.width;
         const h = image.naturalHeight || image.height;
         canvas.width = w;
@@ -76,11 +78,11 @@ export class FileHelper {
         ctx.putImageData(imgData, 0, 0);
 
         const newImg = new Image();
-        newImg.onload = function() {
+        newImg.onload = function (): void {
           resolve(newImg);
         };
 
-        image.onerror = function(e) {
+        image.onerror = function (e): void {
           reject(e);
         };
 

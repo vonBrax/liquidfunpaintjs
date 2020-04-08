@@ -9,4 +9,4 @@
 /// <reference path="./Dynamics/Joints/index.d.ts" />
 /// <reference path="./Dynamics/index.d.ts" />
 /// <reference path="./Particle/index.d.ts" />
-/// <reference path="./Rope/rope.d.ts" />
+/// <reference path="./Rope/index.d.ts" />
