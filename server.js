@@ -18,17 +18,17 @@ app.get('/shaders', (req, res) => {
   res.end();
 });
 
-app.get('/a.out.worker.js', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src/liquidfun/a.out.worker.js'));
-});
-app.get('/a.out.wasm', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src/liquidfun/a.out.wasm'));
-});
+// app.get('/a.out.worker.js', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'src/liquidfun/a.out.worker.js'));
+// });
+// app.get('/a.out.wasm', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'src/liquidfun/a.out.wasm'));
+// });
 app.get('/liquidfun.worker.js', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src/liquidfun/liquidfun.worker.js'));
+  res.sendFile(path.join(__dirname, 'static/liquidfun/liquidfun.worker.js'));
 });
 app.get('/liquidfun.wasm', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src/liquidfun/liquidfun.wasm'));
+  res.sendFile(path.join(__dirname, 'static/liquidfun/liquidfun.wasm'));
 });
 
 app.listen(5555, () => {

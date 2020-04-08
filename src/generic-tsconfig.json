@@ -3,8 +3,8 @@
     "target": "es6",
     "module": "esnext",
     "moduleResolution": "node",
-    "rootDir": "./src",
-    "outDir": "./dist/",
+    "rootDir": ".",
+    "outDir": "../dist/",
     "composite": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -12,12 +12,12 @@
     "esModuleInterop": true,
     "noImplicitAny": true,
     "allowJs": true,
-    "lib": [
-      "ES2020"
-    ],
+    // "lib": [
+    //   "ES2020"
+    // ],
     "types": ["emscripten", "liquidfun"],
     "typeRoots": [
-      "./typings"
+      "./typings/"
     ]
   }
 }

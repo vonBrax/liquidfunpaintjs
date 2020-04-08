@@ -30,7 +30,7 @@ export class FileHelper {
       image.onload = function (): void {
         resolve(image);
       };
-      image.onerror = function (e): void {
+      image.onerror = function (e: Event): void {
         reject(e);
       };
       image.src = `/static/${fileName}`;
@@ -82,7 +82,7 @@ export class FileHelper {
           resolve(newImg);
         };
 
-        image.onerror = function (e): void {
+        image.onerror = function (e: Event): void {
           reject(e);
         };
 

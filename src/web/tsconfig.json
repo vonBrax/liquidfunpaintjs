@@ -1,5 +1,5 @@
 {
-  "extends": "../../generic-tsconfig.json",
+  "extends": "../generic-tsconfig.json",
   "compilerOptions": {
     "lib": [
       "es2020",

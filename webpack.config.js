@@ -1,15 +1,15 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-// const SRC_PATH = path.join(__dirname, 'src');
+
 const WEB_PATH = path.join(__dirname, 'src/web');
-const WORKER_PATH = path.join(__dirname, 'src/worker');
-// const UTIL_PATH = path.join(__dirname, 'src/util');
+// const WORKER_PATH = path.join(__dirname, 'src/worker');
+// const COMMON_PATH = path.join(__dirname, 'src/common');
 
 module.exports = {
   mode: 'development',
   entry: {
     main: path.join(WEB_PATH, 'index.ts'),
-    worker: path.join(WORKER_PATH, 'worker.ts'),
+    // worker: path.join(WORKER_PATH, 'worker.ts'),
   },
   devtool: 'cheap-module-eval-source-map',
   module: {
@@ -17,20 +17,11 @@ module.exports = {
       {
         test: /\.tsx?$/,
         loader: require.resolve('ts-loader'),
-        // options: {
-        //   transpileOnly: true,
-        // },
         exclude: /node_modules/,
+        options: {
+          projectReferences: true,
+        },
       },
-      // {
-      //   test: /\.tsx?$/,
-      //   include: [WORKER_PATH],
-      //   loader: 'ts-loader',
-      //   options: {
-      //     instance: 'worker',
-      //     configFile: path.join(WORKER_PATH, 'tsconfig.json'),
-      //   },
-      // },
       // {
       //   test: /\.tsx?$/,
       //   include: [WEB_PATH],
@@ -43,11 +34,20 @@ module.exports = {
       // },
       // {
       //   test: /\.tsx?$/,
-      //   include: [UTIL_PATH],
+      //   include: [WORKER_PATH],
+      //   loader: 'ts-loader',
+      //   options: {
+      //     instance: 'worker',
+      //     configFile: path.join(WORKER_PATH, 'tsconfig.json'),
+      //   },
+      // },
+      // {
+      //   test: /\.tsx?$/,
+      //   include: [COMMON_PATH],
       //   loader: 'ts-loader',
       //   options: {
       //     instance: 'other',
-      //     configFile: path.join(__dirname, 'tsconfig.json'),
+      //     configFile: path.join(COMMON_PATH, 'tsconfig.json'),
       //   },
       // },
     ],

@@ -1,12 +1,13 @@
-/*
-/// <reference path="../../node_modules/typescript/lib/lib.dom.d.ts" />
-/// <reference path="../../node_modules/typescript/lib/lib.es2020.d.ts" />
+/// <reference path="./es2015.promise.d.ts" />
+/// <reference path="./es2015.iterable.d.ts" />
+/// <reference path="./webworker.d.ts" />
+
+/**
+ * 
+ 
+/// <reference path="../../node_modules/typescript/lib/lib.es5.d.ts" />
 */
 
-/// <reference no-default-lib="true"/>
-/// <reference path="../../node_modules/typescript/lib/lib.es2015.promise.d.ts" />
-/// <reference path="../../node_modules/typescript/lib/lib.es2015.iterable.d.ts" />
-/// <reference path="../../node_modules/typescript/lib/lib.es5.d.ts" />
 
 /**
  * This file only purpose is to provide some DOM types inside the worker context.
@@ -15,35 +16,35 @@
  * I could not find any other sane way of doing this...
  */
 
-interface PromiseLike<T> {
-  /**
-   * Attaches callbacks for the resolution and/or rejection of the Promise.
-   * @param onfulfilled The callback to execute when the Promise is resolved.
-   * @param onrejected The callback to execute when the Promise is rejected.
-   * @returns A Promise for the completion of which ever callback is executed.
-   */
-  then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): PromiseLike<TResult1 | TResult2>;
-}
+// interface PromiseLike<T> {
+//   /**
+//    * Attaches callbacks for the resolution and/or rejection of the Promise.
+//    * @param onfulfilled The callback to execute when the Promise is resolved.
+//    * @param onrejected The callback to execute when the Promise is rejected.
+//    * @returns A Promise for the completion of which ever callback is executed.
+//    */
+//   then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): PromiseLike<TResult1 | TResult2>;
+// }
 
- /**
- * Represents the completion of an asynchronous operation
- */
-interface Promise<T> {
-  /**
-   * Attaches callbacks for the resolution and/or rejection of the Promise.
-   * @param onfulfilled The callback to execute when the Promise is resolved.
-   * @param onrejected The callback to execute when the Promise is rejected.
-   * @returns A Promise for the completion of which ever callback is executed.
-   */
-  then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+//  /**
+//  * Represents the completion of an asynchronous operation
+//  */
+// interface Promise<T> {
+//   /**
+//    * Attaches callbacks for the resolution and/or rejection of the Promise.
+//    * @param onfulfilled The callback to execute when the Promise is resolved.
+//    * @param onrejected The callback to execute when the Promise is rejected.
+//    * @returns A Promise for the completion of which ever callback is executed.
+//    */
+//   then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
 
-  /**
-   * Attaches a callback for only the rejection of the Promise.
-   * @param onrejected The callback to execute when the Promise is rejected.
-   * @returns A Promise for the completion of the callback.
-   */
-  catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
-}
+//   /**
+//    * Attaches a callback for only the rejection of the Promise.
+//    * @param onrejected The callback to execute when the Promise is rejected.
+//    * @returns A Promise for the completion of the callback.
+//    */
+//   catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
+// }
 
 declare var document: Document;
 
@@ -52,6 +53,7 @@ declare var console: Console;
 declare type EventListenerOrEventListenerObject = EventListener | EventListenerObject;
 
 declare function fetch(input: RequestInfo, init?: RequestInit): Promise<Response>;
+// declare function postMessage(message: any, targetOrigin: string, transfer?: Transferable[]): void;
 
 type BodyInit =
 | Blob
@@ -683,12 +685,12 @@ interface Response extends Body {
   clone(): Response;
 }
 
-declare var Response: {
-  prototype: Response;
-  // new(body?: BodyInit | null, init?: ResponseInit): Response;
-  error(): Response;
-  redirect(url: string, status?: number): Response;
-};
+// declare var Response: {
+//   prototype: Response;
+//   // new(body?: BodyInit | null, init?: ResponseInit): Response;
+//   error(): Response;
+//   redirect(url: string, status?: number): Response;
+// };
 
 interface RequestInit {
   /**
@@ -1448,7 +1450,7 @@ interface MessageEvent extends Event {
    * Returns the MessagePort array sent with the message, for cross-document messaging and channel messaging.
    */
   // readonly ports: ReadonlyArray<MessagePort>;
-  readonly ports: MessagePort[];
+  // readonly ports: MessagePort[];
   /**
    * Returns the WindowProxy of the source window, for cross-document messaging, and the MessagePort being attached, in the connect event fired at SharedWorkerGlobalScope objects.
    */

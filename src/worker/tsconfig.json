@@ -1,9 +1,8 @@
 {
-  "extends": "../../generic-tsconfig.json",
+  "extends": "../generic-tsconfig.json",
   "compilerOptions": {
     "lib": [
-      "ES2020",
-      "webworker"
+      "ES2020"
     ],
     "types": ["emscripten", "liquidfun", "domproxy"],
     // "types": ["emscripten", "liquidfun"]

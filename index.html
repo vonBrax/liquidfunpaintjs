@@ -219,11 +219,13 @@
       customMessageQueue: [],
       onCustomMessage: function(event) {
         Module.customMessageQueue.push(event);
-      }
+      },
+      printErr: console.error,
+      print: console.info
     };
   </script>
 
-  <script src="src/liquidfun/liquidfun.js"></script>
+  <script src="static/liquidfun/liquidfun.js"></script>
 
   <script>
     // Used once to premultiply image assest.
