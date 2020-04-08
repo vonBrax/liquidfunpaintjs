@@ -10,7 +10,8 @@
     "eslint": "eslint . --ext .ts,.js --ignore-path .gitignore",
     "lint:fix": "npm run eslint -- --fix",
     "lint:tsc": "tsc --project src/web/tsconfig.json",
-    "build:tsc": "tsc --build src/web"
+    "build:tsc": "tsc --build src/web",
+    "setup:liquidfun": "git submodule update --init && cd liquidfun/liquidfun/Box2D/lfjs && emcc -I ../ -o ../../../../liquidfunpaint/static/liquidfun/liquidfun.js --bind ./jsBindings/bindings.cpp -Oz --proxy-to-worker -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']\" -s \"ENVIRONMENT=web,worker\""
   },
   "keywords": [],
   "author": "",
