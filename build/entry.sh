@@ -5,6 +5,7 @@
 set -eu
 
 UPDATE="update"
+SHELL="shell"
 
 if [ "$#" -ne 1 ]
 then
@@ -15,12 +16,24 @@ fi
 if [[ "$1" == "$UPDATE" ]]
 then
   echo "Message received, updating."
-elif [[ $1 -eq "test" ]]
+  echo "Cleaning liquidfun folder"
+  cd /common
+  rm *.*
+  echo "Pulling emscripten"
+  cd /emscripten
+  git pull
+  echo "Pulling liquidun"
+  cd /liquidfun
+  git checkout feature/embind
+  git pull
+  cd liquidfun/Box2D/lfjs
+  echo "Compiling liquidfun"
+  /emscripten/emcc -I ../ -o /common/liquidfun.js --bind ./jsBindings/bindings.cpp -Oz --proxy-to-worker -s "EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']" -s "ENVIRONMENT=web,worker"
+elif [[ "$1" == "$SHELL" ]]
 then
-  echo "Got it! Let's test it."
-elif [[ $1 -eq "shell" ]]
-then
-  sh
+  echo "Ok, lets get you a terminal, shall we?"
+  bash
 else
-  echo "Sorry... could not understand '$1'"
+  echo "Sorry... could not understand what you meant by '$1'..."
+  exit 1
 fi

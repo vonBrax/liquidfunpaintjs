@@ -105,3 +105,6 @@ dist
 
 # Webassembly files
 *.wasm
+
+# Liquidfun compiled files
+static/liquidfun/
