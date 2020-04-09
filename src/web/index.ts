@@ -93,9 +93,9 @@ function registerListeners(): void {
       canvas.height = height;
     }
     postCustomMessage({
-      type: 'event',
-      name: 'resize',
-      data: { width, height },
+      type: 'resize',
+      width,
+      height,
     });
   });
 }
@@ -106,9 +106,8 @@ Module.onCustomMessage = function (event: MessageEvent): void {
     // activity.onCreate();
 
     postCustomMessage({
-      type: 'event',
-      name: 'set-pixel-ratio',
-      data: { value: window.devicePixelRatio },
+      type: 'set-pixel-ratio',
+      value: window.devicePixelRatio,
     });
     registerListeners();
   } else if (event.data.userData.type === 'log' && log) {

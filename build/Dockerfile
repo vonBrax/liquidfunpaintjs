@@ -1,37 +1,56 @@
-FROM  node:12.16.1-alpine3.11
+FROM  ubuntu:18.04
 
-# TODO: REMOVE IF NOT NEEDED
-RUN apk add bash bash-completion
+RUN apt-get update && apt-get install -y \
+  software-properties-common \
+  build-essential \
+  wget \
+  gnupg1\
+  make \
+  cmake \
+  git \
+  python3 \
+  python3-distutils && \
+  wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
+  apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main"
 
-RUN apk update
-
-RUN apk add --no-cache --virtual build-dependencies build-base gcc g++ binutils make cmake extra-cmake-modules git python3 binaryen
-
-# RUN apk search llvm
-
-# RUN apk search clang
-
-# RUN apk update && apk upgrade
-
-# clang lld llvm
+RUN apt-get update && \
+  apt-get install -y \
+  clang-11 \
+  lldb-11 \
+  lld-11
+  # build-essential \
+  # gcc \
+  # g++ \
+  # binutils \
+  # make \
+  # cmake \
+  # extra-cmake-modules \
+  # git \
+  # python3 \
+  # python3-distutils \
+  # binaryen \
+  # llvm-11 \
+  # clangd-11 \
+  # nodejs \
+  # bash \
+  # bash-completion
 
 # Build LLVM
-RUN git clone --depth=1 https://github.com/llvm/llvm-project.git && \
-  cd llvm-project/llvm && \
-  mkdir build && \
-  cd build && \
-  cmake ../ -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='lld;clang' -DLLVM_TARGETS_TO_BUILD="host;WebAssembly" -DLLVM_INCLUDE_EXAMPLES=OFF -DLLVM_INCLUDE_TESTS=OFF && \
-  cmake --build .
- # cmake --build . --target install
+# RUN git clone --depth=1 https://github.com/llvm/llvm-project.git && \
+#   cd llvm-project/llvm && \
+#   mkdir build && \
+#   cd build && \
+#   cmake ../ -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='lld;clang' -DLLVM_TARGETS_TO_BUILD="host;WebAssembly" -DLLVM_INCLUDE_EXAMPLES=OFF -DLLVM_INCLUDE_TESTS=OFF && \
+#   cmake --build .
+#  # cmake --build . --target install
 
 # Build binaryen
-# RUN git clone --depth=1 https://github.com/WebAssembly/binaryen.git && \
-#   cd binaryen && \
-#   cmake . && \
-#   make
+RUN git clone --depth=1 https://github.com/WebAssembly/binaryen.git && \
+  cd binaryen && \
+  cmake . && \
+  make
 
-# Get emscripten
-
+# Get emscripten && liquidfun
 RUN git clone https://github.com/vonBrax/emscripten.git && \
   git clone https://github.com/vonBrax/liquidfun.git && \
   cd liquidfun && \
@@ -40,27 +59,25 @@ RUN git clone https://github.com/vonBrax/emscripten.git && \
   cd .. && \
   mkdir common
 
-ENV BINARYEN=/usr/share/binaryen
+ENV EMSCRIPTEN=/emscripten
+ENV LLVM=/usr/lib/llvm-11/bin
+ENV BINARYEN=/binaryen
 
-RUN cd liquidfun/liquidfun/Box2D/lfjs && \
-  /emscripten/emcc \
-    -I ../ \
-    -o /common/liquidfun.js \
-    --bind ./jsBindings/bindings.cpp \
-    -Oz \
-    --proxy-to-worker \
-    -s "EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']" \
-    -s "ENVIRONMENT=web,worker"
+RUN /emscripten/emcc --version
 
-RUN cd liquidfun/liquidfun/Box2D/lfjs && \
-  /emscripten/emcc \
-    -I ../ \
-    # -o ../../../../liquidfunpaint/static/liquidfun/liquidfun.js \
-    -o /common/liquidfun.js \
-    --bind ./jsBindings/bindings.cpp \
-    -Oz \
-    --proxy-to-worker \
-    -s "EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']" \
-    -s "ENVIRONMENT=web,worker"
+COPY entry.sh /
 
-CMD [ "sh" ]
+# RUN cat /root/.emscripten
+
+# RUN cd liquidfun/liquidfun/Box2D/lfjs && \
+#   /emscripten/emcc \
+#     -I ../ \
+#     -o /common/liquidfun.js \
+#     --bind ./jsBindings/bindings.cpp \
+#     -Oz \
+#     --proxy-to-worker \
+#     -s "EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']" \
+#     -s "ENVIRONMENT=web,worker"
+
+ENTRYPOINT [ "/entry.sh" ]
+# CMD [ "sh" ]

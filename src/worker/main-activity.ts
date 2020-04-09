@@ -98,11 +98,11 @@ export class MainActivity implements OnTouchListener {
       // case 'pointercancel':
       //   this.onTouch(data);
       //   break;
-      case 'set-gravity':
-        Renderer.getInstance()
-          .acquireWorld()
-          .SetGravity(new Module.Vec2(event.x, event.y));
-        break;
+      // case 'set-gravity':
+      //   Renderer.getInstance()
+      //     .acquireWorld()
+      //     .SetGravity(new Module.Vec2(event.x, event.y));
+      //   break;
       case 'start-simulation':
         Renderer.getInstance().startSimulation();
         // this.postCustomMessage({ type: 'start-simulation' });
@@ -121,11 +121,11 @@ export class MainActivity implements OnTouchListener {
         // this.postCustomMessage({ type: 'set-stats', value: data.checked });
         break;
       case 'set-debug':
-        Renderer.DEBUG_DRAW = event.checked;
+        Renderer.DEBUG_DRAW = Boolean(event.value);
         // this.postCustomMessage({ type: 'set-debug', value: data.checked });
         break;
       case 'set-blur':
-        state.set('blur', event.checked);
+        state.set('blur', event.value);
         // this.postCustomMessage({ type: 'set-blur', value: data.checked });
         break;
       case 'set-tool':
@@ -135,6 +135,14 @@ export class MainActivity implements OnTouchListener {
             this.getColor(event.color),
           );
         }
+        break;
+      case 'set-color':
+        Tool.getTool(this.mSelected).setColor(
+          this.getColor(Number(event.value)),
+        );
+        break;
+      case 'set-pixel-ratio':
+        this.setPixelRatio(Number(event.value));
         break;
       // case 'WATER':
       //   this.select(ToolType.WATER);

@@ -2,14 +2,14 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const WEB_PATH = path.join(__dirname, 'src/web');
-// const WORKER_PATH = path.join(__dirname, 'src/worker');
+const WORKER_PATH = path.join(__dirname, 'src/worker');
 // const COMMON_PATH = path.join(__dirname, 'src/common');
 
 module.exports = {
   mode: 'development',
   entry: {
     main: path.join(WEB_PATH, 'index.ts'),
-    // worker: path.join(WORKER_PATH, 'worker.ts'),
+    worker: path.join(WORKER_PATH, 'worker.ts'),
   },
   devtool: 'cheap-module-eval-source-map',
   module: {
