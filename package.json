@@ -13,7 +13,7 @@
     "build:tsc": "tsc --build src/web",
     "build:liquidfun": "docker build -t liquidfun ./build",
     "update:liquidfun": "docker run -v $PWD/static/liquidfun:/common --rm liquidfun update",
-    "shell:liquidfun": "docker run -v $PWD/static/liquidfun:/common -ti --rm liquidfun shell",
+    "shell:liquidfun": "docker run -v $PWD/static/liquidfun:/common -ti --rm liquidfun shell"
   },
   "keywords": [],
   "author": "",
