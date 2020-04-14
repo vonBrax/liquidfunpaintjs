@@ -11,11 +11,11 @@
     "lint:fix": "npm run eslint -- --fix",
     "lint:tsc": "tsc --project src/web/tsconfig.json",
     "build:tsc": "tsc --build src/web",
-    "lf:build": "docker build --squash -t liquidfun ./build/em-ubuntu",
-    "lf:update": "docker run -v $(PWD)/static/liquidfun:/src liquidfun update",
-    "lf:update-win": "docker run -v %cd%/static/liquidfun:/src liquidfun update",
-    "lf:shell": "docker run -v $(PWD)/static/liquidfun:/src -ti --rm liquidfun shell",
-    "lf:shell-win": "docker run -v %cd%/static/liquidfun:/src -ti --rm liquidfun shell"
+    "lf:build": "docker build -t vonbrax/liquidfun:1.1.0 ./build/liquidfun",
+    "lf:update": "docker run -v $(PWD)/static/liquidfun:/src vonbrax/liquidfun:1.1.0 update",
+    "lf:shell": "docker run -v $(PWD)/static/liquidfun:/src -ti --rm vonbrax/liquidfun:1.1.0 shell",
+    "lf:update-win": "docker run -v %cd%/static/liquidfun:/src --rm vonbrax/liquidfun:1.1.0 update",
+    "lf:shell-win": "docker run -v %cd%/static/liquidfun:/src -ti --rm vonbrax/liquidfun:1.1.0 shell"
   },
   "keywords": [],
   "author": "",
