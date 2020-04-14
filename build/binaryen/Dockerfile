@@ -1,6 +1,5 @@
 FROM ubuntu:18.04 AS build-base
 
-# ARG VERSION=1.39.1
 ARG VERSION=version_91
 
 RUN echo "\n## Update and install dependencies" \

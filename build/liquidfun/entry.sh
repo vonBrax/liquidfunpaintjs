@@ -6,35 +6,39 @@ set -eu
 
 UPDATE="update"
 SHELL="shell"
+REPOSITORY="https://github.com/vonbrax/emscripten"
+REVISION="e32445dc0d7fd62d8fe6564c4db8f30541257691"
 
 if [ "$#" -lt 1 ]
 then
-  echo "Must provide at least one argument"
+  echo "Error: Must provide at least one argument"
   exit 1
 fi
 
 if [[ "$1" == "update" ]]
 then
-  echo "Cleaning shared folder"
+  echo "## Clean shared volume directory"
   rm -rf /src/*
 
-  if [[ -z "$2" || "$2" == "emscripten" ]]
+  if [[ "$#" -lt 2 || "$2" == "emscripten" ]]
   then
-    echo "Updating emscripten"
-    echo "Pulling emscripten latest changes"
-    rm -rf /emscripten
-    git clone --depth 1 https://github.com/vonBrax/emscripten.git /emscripten
+    echo "## Replace emscripten with forked version"
+    cd /emscripten
+    find . -name ".data" -prune -o -not -name ".emscripten*" -exec rm -fr {} \; || true
+    git init
+    git remote add origin $REPOSITORY
+    git fetch --depth 1 origin $REVISION
+    git reset --hard $REVISION
   fi
 
-  if [[ -z "$2" || "$2" == "liquidfun" ]]
+  if [[ "$#" -lt 2 || "$2" == "liquidfun" ]]
   then
-    echo "Updating liquidfun"
-    echo "Pulling liquidun latest changes"
+    echo "## Check liquidfun repo for changes"
     cd /liquidfun
     git checkout feature/embind 1> /dev/null
     git pull 1> /dev/null
     cd liquidfun/Box2D/lfjs
-    echo "Compiling liquidfun wasm"
+    echo "## Compiling liquidfun to web assembly"
     emcc -I ../ -o /src/liquidfun.js --bind ./jsBindings/bindings.cpp -Oz --proxy-to-worker -s "EXTRA_EXPORTED_RUNTIME_METHODS=['getValue']" -s "ENVIRONMENT=web,worker"
   fi
 elif [[ "$1" == "$SHELL" ]]

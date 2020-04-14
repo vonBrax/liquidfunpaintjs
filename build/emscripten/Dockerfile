@@ -2,7 +2,7 @@ FROM vonbrax/binaryen:version_91 AS binaryen
 
 # ------------------------------------------------------------------------------
 
-FROM vonbrax/llvm:11.1.0 AS llvm
+FROM vonbrax/llvm:11.0.0 AS llvm
 
 # ------------------------------------------------------------------------------
 
@@ -17,35 +17,23 @@ ENV EM_CACHE ${EM_DATA}/cache
 ENV EM_PORTS ${EM_DATA}/ports
 
 ENV BINARYEN=/binaryen
-ENV LLVM=/usr/bin
-ENV PATH=/emscripten:/binaryen:${PATH}
-
-# COPY --from=binaryen \
-#   /binaryen/asm2wasm \
-#   /binaryen/wasm-opt \
-#   /binaryen/wasm-emscripten-finalize \
-#   /binaryen/wasm-metadce \
-#   # DEST
-#   /binaryen/bin/
+ENV LLVM=/llvm/bin
+ENV PATH=/emscripten:/binaryen:/llvm/bin:${PATH}
 
 COPY --from=binaryen /binaryen /binaryen/bin
 
-COPY --from=llvm /llvm /usr
+COPY --from=llvm /llvm /llvm
 
 RUN echo "\n## Link LLVM binaries" \
-&& ln -s /usr/bin/clang-11 /usr/bin/clang \
-&& ln -s /usr/bin/clang-11 /usr/bin/clang++ \
-&& ln -s /usr/bin/clang-11 /usr/bin/clang-cl \
-&& ln -s /usr/bin/clang-11 /usr/bin/clang-cpp \
-&& ln -s /usr/bin/lld-11 /usr/bin/lld \
-&& ln -s /usr/bin/lld-11 /usr/bin/ld.lld \
-&& ln -s /usr/bin/lld-11 /usr/bin/ld64.lld \
-&& ln -s /usr/bin/lld-11 /usr/bin/lld-link \
-&& ln -s /usr/bin/lld-11 /usr/bin/wasm-ld \
-&& ln -s /usr/bin/llc-11 /usr/bin/llc \
-&& ln -s /usr/bin/llvm-ar-11 /usr/bin/llvm-ar \
-&& ln -s /usr/bin/llvm-as-11 /usr/bin/llvm-as \
-&& ln -s /usr/bin/llvm-nm-11 /usr/bin/llvm-nm \
+&& ln -s /llvm/bin/clang /llvm/bin/clang-11 \
+&& ln -s /llvm/bin/clang /llvm/bin/clang++ \
+&& ln -s /llvm/bin/clang /llvm/bin/clang-cpp \
+&& ln -s /llvm/bin/llvm-ar /llvm/bin/llvm-dlltool \
+&& ln -s /llvm/bin/llvm-ar /llvm/bin/llvm-lib \
+&& ln -s /llvm/bin/llvm-ar /llvm/bin/llvm-ranlib \
+&& wasm-ld --version \
+&& clang --version \
+&& llvm-ar --version \
 && echo "\n## Update and install packages" \
 && apt-get -qq -y update \
 && apt-get -qq install -y --no-install-recommends \
@@ -97,8 +85,6 @@ RUN echo "\n## Link LLVM binaries" \
 && printf '#include <iostream>\nint main(){std::cout << "HELLO FROM DOCKER C++"<<std::endl;return 0;}' > test.cpp \
 && emcc test.cpp && node a.out.js \
 && rm test.cpp *.js *.wasm \
-# && emcc --std=c++11 /emscripten/tests/hello_world.cpp -o test.js -s WASM=0 && node test.js \
-# && emcc --std=c++11 /emscripten/tests/hello_world.cpp -o test.js -s WASM=1 && node test.js \
 # sleep will make sure that created cache will be stored correctly
 && sleep 2 \
 && echo "## Done"
