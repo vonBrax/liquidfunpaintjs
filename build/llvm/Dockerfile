@@ -15,24 +15,18 @@ RUN echo "\n## Update and install dependencies" \
   build-essential \
   musl \
   musl-tools \
-&& echo "\n## Install llvm ${VERSION} toolchain" \
-# dash doesn't support "<<<""
-&& IFS="." read -r MAJOR REST << EOF "${VERSION}" EOF\
-# && REPO_NAME="deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic$LLVM_VERSION_STRING  main" \
-# && wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
-# && add-apt-repository "deb http://apt.llvm.org/bionic/   llvm-toolchain-bionic  main" \
-# && add-apt-repository "${REPO_NAME}" \
-# && apt-get -qq update \
-# && apt-get -qq install -y clang-$LLVM_VERSION lld-$LLVM_VERSION \
+&& MAJOR=$(echo ${VERSION} | cut -d "." -f1) \
+&& echo "\n## Install llvm-${MAJOR} toolchain" \
 && wget https://apt.llvm.org/llvm.sh \
 && chmod +x llvm.sh \
 && ./llvm.sh $MAJOR \
+&& rm llvm.sh \
 && echo "\n## Install exodus" \
 && pip install exodus-bundler \
-# Export only the bare minimum number of llvm tools
-# so that emscripten can compile to wasm
+# Export the minimum number of llvm tools necessary
+# in order to make emscripten run
 && echo "\n## Prepare llvm binaries to export" \
-&& cd /usr/lib/llvm-11/bin \
+&& cd /usr/lib/llvm-${MAJOR}/bin \
 && exodus --tarball --output /tmp/bundle.tgz \
   clang \
   wasm-ld \

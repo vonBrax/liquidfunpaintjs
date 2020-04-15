@@ -40,21 +40,26 @@ RUN echo "\n## Link LLVM binaries" \
   ca-certificates \
   wget \
   gnupg1 \
+  binutils \
   python3 \
   python3-distutils \
   nodejs \
-  binutils \
 && echo "\n## Get emscripten" \
 && wget -q -O emscripten-release https://github.com/emscripten-core/emscripten/archive/${VERSION}.tar.gz \
 && tar zxf emscripten-release \
 && mv /emscripten-${VERSION} ${EMSCRIPTEN} \
 && mkdir -p ${EM_CACHE} \
 && mkdir -p ${EM_PORTS} \
+# Create the .emscripten file
 && emcc -v \
 && echo "\n## Clean up" \
 && rm /emscripten-release \
 && strip -s `which node` \
-&& apt-get -qq -y purge binutils wget gnupg1 ca-certificates \
+&& apt-get -qq -y purge \
+  ca-certificates \
+  wget \
+  gnupg1 \
+  binutils \
 && apt-get -y clean \
 && apt-get -y autoclean \
 && apt-get -y autoremove \
@@ -81,9 +86,13 @@ RUN echo "\n## Link LLVM binaries" \
 && rm -rf **/tests \
 && rm -rf **/*.md \
 && rm -rf **/*.bat \
-&& echo "\n## Test and pre-populate cache" \
+&& echo "\n## Test emcc and pre-populate cache" \
 && printf '#include <iostream>\nint main(){std::cout << "HELLO FROM DOCKER C++"<<std::endl;return 0;}' > test.cpp \
 && emcc test.cpp && node a.out.js \
+# Embind
+&& printf "#include <string>\n#include <emscripten/bind.h>\nint main() {\n    std::string str = \"Hello, world\";\n    auto temp = emscripten::val(str);\n}\n" > test.cpp \
+# && emcc test.cpp -o test.js -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=1 -s PROXY_TO_PTHREAD=1 --bind -std=c++11 \
+&& emcc test.cpp -o test.js --bind -std=c++11 \
 && rm test.cpp *.js *.wasm \
 # sleep will make sure that created cache will be stored correctly
 && sleep 2 \
