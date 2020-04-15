@@ -1,5 +1,7 @@
 // import { MainActivity } from '../worker/main-activity';
 // import { throttle } from '../util/functionsHelper';
+// https://developers.google.com/web/fundamentals/design-and-ux/input/touch/?hl=fi
+// view-source:https://googlesamples.github.io/web-fundamentals/fundamentals/design-and-ux/input/touch/touch-demo-1.html
 
 interface EventHistory {
   byIndex: Map<number, PointerEvent[]>;
