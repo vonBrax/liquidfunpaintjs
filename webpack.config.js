@@ -66,6 +66,7 @@ module.exports = {
     }),
   ],
   devServer: {
+    host: '0.0.0.0',
     proxy: {
       '!/src/liquidfun/**': 'http://localhost:5555',
       '!/static/**': 'http://localhost:5555',
