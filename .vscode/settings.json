@@ -1,6 +1,7 @@
 {
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
+  "files.autoSave": "onWindowChange",
   "eslint.enable": true,
   "editor.formatOnSave": false,
   "editor.codeActionsOnSave": {
