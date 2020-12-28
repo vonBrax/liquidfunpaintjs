@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": ["src/main.ts"],
+  "references": [
+    {
+      "path": "./packages/common/"
+    },
+    {
+      "path": "./packages/web"
+    },
+    {
+      "path": "./packages/worker"
+    }
+  ]
+}

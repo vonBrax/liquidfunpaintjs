@@ -108,3 +108,9 @@ dist
 
 # Liquidfun compiled files
 static/liquidfun/
+
+# TS build info
+tsconfig.tsbuildinfo
+
+# Packages lib folder
+lib/

@@ -1,0 +1,108 @@
+-rwxr-xr-x 1 1000 1000  79283512 Oct 13 04:21 bugpoint
+-rwxr-xr-x 1 1000 1000  37434864 Oct 13 04:21 c-index-test
+lrwxrwxrwx 1 1000 1000         8 Oct 13 04:22 clang -> clang-11
+lrwxrwxrwx 1 1000 1000         5 Oct 13 04:22 clang++ -> clang
+-rwxr-xr-x 1 1000 1000 122214376 Oct 13 04:21 clang-11
+-rwxr-xr-x 1 1000 1000   2338568 Oct 13 04:17 clang-apply-replacements
+-rwxr-xr-x 1 1000 1000  27505168 Oct 13 04:17 clang-change-namespace
+-rwxr-xr-x 1 1000 1000  89451432 Oct 13 04:21 clang-check
+lrwxrwxrwx 1 1000 1000         5 Oct 13 04:22 clang-cl -> clang
+lrwxrwxrwx 1 1000 1000         5 Oct 13 04:22 clang-cpp -> clang
+-rwxr-xr-x 1 1000 1000  26810672 Oct 13 04:17 clang-doc
+-rwxr-xr-x 1 1000 1000  26145160 Oct 13 04:21 clang-extdef-mapping
+-rwxr-xr-x 1 1000 1000   2332096 Oct 13 04:17 clang-format
+-rwxr-xr-x 1 1000 1000  26829880 Oct 13 04:17 clang-include-fixer
+-rwxr-xr-x 1 1000 1000  27437264 Oct 13 04:17 clang-move
+-rwxr-xr-x 1 1000 1000   3531944 Oct 13 04:16 clang-offload-bundler
+-rwxr-xr-x 1 1000 1000   2209840 Oct 13 04:17 clang-offload-wrapper
+-rwxr-xr-x 1 1000 1000  28759472 Oct 13 04:17 clang-query
+-rwxr-xr-x 1 1000 1000  27610856 Oct 13 04:17 clang-refactor
+-rwxr-xr-x 1 1000 1000  26625296 Oct 13 04:17 clang-rename
+-rwxr-xr-x 1 1000 1000  26754632 Oct 13 04:17 clang-reorder-fields
+-rwxr-xr-x 1 1000 1000  26294160 Oct 13 04:20 clang-scan-deps
+-rwxr-xr-x 1 1000 1000  56710264 Oct 13 04:18 clang-tidy
+-rwxr-xr-x 1 1000 1000  38577672 Oct 13 04:18 clangd
+-rwxr-xr-x 1 1000 1000   5188928 Oct 13 04:17 diagtool
+-rwxr-xr-x 1 1000 1000  55567096 Oct 13 04:21 dsymutil
+-rwxr-xr-x 1 1000 1000  26878344 Oct 13 04:17 find-all-symbols
+-rwxr-xr-x 1 1000 1000     21426 Oct  7 10:10 git-clang-format
+-rwxr-xr-x 1 1000 1000      9974 Oct  7 10:10 hmaptool
+lrwxrwxrwx 1 1000 1000         3 Oct 13 04:22 ld.lld -> lld
+lrwxrwxrwx 1 1000 1000         3 Oct 13 04:22 ld64.lld -> lld
+-rwxr-xr-x 1 1000 1000  72533848 Oct 13 04:21 llc
+-rwxr-xr-x 1 1000 1000  85371240 Oct 13 04:21 lld
+lrwxrwxrwx 1 1000 1000         3 Oct 13 04:22 lld-link -> lld
+-rwxr-xr-x 1 1000 1000  31210160 Oct 13 04:21 lli
+lrwxrwxrwx 1 1000 1000        15 Oct 13 04:22 llvm-addr2line -> llvm-symbolizer
+-rwxr-xr-x 1 1000 1000  19981344 Oct 13 04:16 llvm-ar
+-rwxr-xr-x 1 1000 1000   3482968 Oct 13 04:17 llvm-as
+-rwxr-xr-x 1 1000 1000    372848 Oct 13 04:15 llvm-bcanalyzer
+-rwxr-xr-x 1 1000 1000  56216296 Oct 13 04:20 llvm-c-test
+-rwxr-xr-x 1 1000 1000   3126272 Oct 13 04:17 llvm-cat
+-rwxr-xr-x 1 1000 1000  24698688 Oct 13 04:17 llvm-cfi-verify
+-rwxr-xr-x 1 1000 1000    242064 Oct 13 04:11 llvm-config
+-rwxr-xr-x 1 1000 1000   4287368 Oct 13 04:16 llvm-cov
+-rwxr-xr-x 1 1000 1000   3520016 Oct 13 04:16 llvm-cvtres
+-rwxr-xr-x 1 1000 1000   3585184 Oct 13 04:16 llvm-cxxdump
+-rwxr-xr-x 1 1000 1000    444688 Oct 13 04:11 llvm-cxxfilt
+-rwxr-xr-x 1 1000 1000    530592 Oct 13 04:15 llvm-cxxmap
+-rwxr-xr-x 1 1000 1000   2783128 Oct 13 04:16 llvm-diff
+-rwxr-xr-x 1 1000 1000   2458304 Oct 13 04:15 llvm-dis
+lrwxrwxrwx 1 1000 1000         7 Oct 13 04:22 llvm-dlltool -> llvm-ar
+-rwxr-xr-x 1 1000 1000  15500432 Oct 13 04:16 llvm-dwarfdump
+-rwxr-xr-x 1 1000 1000  54518024 Oct 13 04:21 llvm-dwp
+-rwxr-xr-x 1 1000 1000   3539920 Oct 13 04:16 llvm-elfabi
+-rwxr-xr-x 1 1000 1000  23889432 Oct 13 04:21 llvm-exegesis
+-rwxr-xr-x 1 1000 1000   5387040 Oct 13 04:18 llvm-extract
+-rwxr-xr-x 1 1000 1000  49763160 Oct 13 04:21 llvm-gsymutil
+-rwxr-xr-x 1 1000 1000   2173104 Oct 13 04:16 llvm-ifs
+lrwxrwxrwx 1 1000 1000        12 Oct 13 04:22 llvm-install-name-tool -> llvm-objcopy
+-rwxr-xr-x 1 1000 1000  26674480 Oct 13 04:19 llvm-jitlink
+lrwxrwxrwx 1 1000 1000         7 Oct 13 04:22 llvm-lib -> llvm-ar
+-rwxr-xr-x 1 1000 1000   4016320 Oct 13 04:18 llvm-link
+-rwxr-xr-x 1 1000 1000   3545992 Oct 13 04:20 llvm-lipo
+-rwxr-xr-x 1 1000 1000  69013776 Oct 13 04:21 llvm-lto
+-rwxr-xr-x 1 1000 1000  78332688 Oct 13 04:21 llvm-lto2
+-rwxr-xr-x 1 1000 1000  21120048 Oct 13 04:18 llvm-mc
+-rwxr-xr-x 1 1000 1000  17699072 Oct 13 04:16 llvm-mca
+-rwxr-xr-x 1 1000 1000  21045296 Oct 13 04:16 llvm-ml
+-rwxr-xr-x 1 1000 1000   3189032 Oct 13 04:17 llvm-modextract
+-rwxr-xr-x 1 1000 1000    289864 Oct 13 04:14 llvm-mt
+-rwxr-xr-x 1 1000 1000  20264928 Oct 13 04:16 llvm-nm
+-rwxr-xr-x 1 1000 1000   4180024 Oct 13 04:16 llvm-objcopy
+-rwxr-xr-x 1 1000 1000  19699664 Oct 13 04:19 llvm-objdump
+-rwxr-xr-x 1 1000 1000    599656 Oct 13 04:16 llvm-opt-report
+-rwxr-xr-x 1 1000 1000   5869248 Oct 13 04:17 llvm-pdbutil
+-rwxr-xr-x 1 1000 1000   1791648 Oct 13 04:16 llvm-profdata
+lrwxrwxrwx 1 1000 1000         7 Oct 13 04:22 llvm-ranlib -> llvm-ar
+-rwxr-xr-x 1 1000 1000    412624 Oct 13 04:14 llvm-rc
+lrwxrwxrwx 1 1000 1000        12 Oct 13 04:22 llvm-readelf -> llvm-readobj
+-rwxr-xr-x 1 1000 1000   5846272 Oct 13 04:17 llvm-readobj
+-rwxr-xr-x 1 1000 1000   3084248 Oct 13 04:21 llvm-reduce
+-rwxr-xr-x 1 1000 1000  16709368 Oct 13 04:17 llvm-rtdyld
+-rwxr-xr-x 1 1000 1000   3564992 Oct 13 04:16 llvm-size
+-rwxr-xr-x 1 1000 1000   3748152 Oct 13 04:17 llvm-split
+-rwxr-xr-x 1 1000 1000   1966960 Oct 13 04:17 llvm-stress
+-rwxr-xr-x 1 1000 1000    307072 Oct 13 04:16 llvm-strings
+lrwxrwxrwx 1 1000 1000        12 Oct 13 04:22 llvm-strip -> llvm-objcopy
+-rwxr-xr-x 1 1000 1000   4997664 Oct 13 04:17 llvm-symbolizer
+-rwxr-xr-x 1 1000 1000   3558160 Oct 13 04:11 llvm-tblgen
+-rwxr-xr-x 1 1000 1000    386256 Oct 13 04:11 llvm-undname
+-rwxr-xr-x 1 1000 1000   5422248 Oct 13 04:17 llvm-xray
+-rwxr-xr-x 1 1000 1000  37747592 Oct 13 04:21 mlir-cpu-runner
+-rwxr-xr-x 1 1000 1000    735168 Oct 13 04:16 mlir-linalg-ods-gen
+-rwxr-xr-x 1 1000 1000  37951960 Oct 13 04:21 mlir-opt
+-rwxr-xr-x 1 1000 1000   8015728 Oct 13 04:21 mlir-reduce
+-rwxr-xr-x 1 1000 1000   1179184 Oct 13 04:11 mlir-tblgen
+-rwxr-xr-x 1 1000 1000  11326208 Oct 13 04:18 mlir-translate
+-rwxr-xr-x 1 1000 1000  26270728 Oct 13 04:17 modularize
+-rwxr-xr-x 1 1000 1000   5756528 Oct 13 04:16 obj2yaml
+-rwxr-xr-x 1 1000 1000  79279984 Oct 13 04:21 opt
+-rwxr-xr-x 1 1000 1000  26159448 Oct 13 04:17 pp-trace
+-rwxr-xr-x 1 1000 1000  19783656 Oct 13 04:17 sancov
+-rwxr-xr-x 1 1000 1000   4913944 Oct 13 04:17 sanstats
+-rwxr-xr-x 1 1000 1000     57935 Oct  7 10:10 scan-build
+-rwxr-xr-x 1 1000 1000      4702 Oct  7 10:10 scan-view
+-rwxr-xr-x 1 1000 1000   3700496 Oct 13 04:17 verify-uselistorder
+lrwxrwxrwx 1 1000 1000         3 Oct 13 04:22 wasm-ld -> lld
+-rwxr-xr-x 1 1000 1000   2062344 Oct 13 04:16 yaml2obj

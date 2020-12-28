@@ -1,0 +1,10 @@
+.vscode
+build
+dist
+node_modules
+socket
+static
+tests/temp
+typings
+liquidfun.js
+lib/

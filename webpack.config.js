@@ -1,75 +1,85 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
-const WEB_PATH = path.join(__dirname, 'src/web');
-const WORKER_PATH = path.join(__dirname, 'src/worker');
+// const WEB_PATH = path.join(__dirname, 'src/web');
+// const WORKER_PATH = path.join(__dirname, 'src/worker');
 // const COMMON_PATH = path.join(__dirname, 'src/common');
 
 module.exports = {
   mode: 'development',
   entry: {
-    main: path.join(WEB_PATH, 'index.ts'),
-    worker: path.join(WORKER_PATH, 'worker.ts'),
+    // main: path.join(WEB_PATH, 'index.ts'),
+    // worker: path.join(WORKER_PATH, 'index.ts'),
+    main: path.join(__dirname, 'src/main.ts'),
+    // main: {
+    //   import: path.join(__dirname, 'src/index.ts'),
+    //   dependOn: 'common',
+    // },
+    // worker: {
+    //   import: '@lfpjs/worker',
+    //   dependOn: 'common',
+    // },
+    // common: '@lfpjs/common',
   },
-  devtool: 'cheap-module-eval-source-map',
+  output: {
+    path: path.join(__dirname, 'dist'),
+    filename: '[name].[contenthash].js',
+    globalObject: 'typeof self !== "object" ? self : this',
+    publicPath: '/',
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
+  },
+  // optimization: {
+  //   runtimeChunk: 'single',
+  // },
+  context: __dirname, // to automatically find tsconfig.json
+  // devtool: 'eval-cheap-module-source-map',
+  devtool: 'eval-cheap-source-map',
+  watch: false,
   module: {
     rules: [
+      // {
+      //   test: /@lfpjs\/worker\/lib\/index\.js$/,
+      //   // test: /worker.js$/,
+      //   loader: 'worker-loader',
+      // },
       {
-        test: /\.tsx?$/,
-        loader: require.resolve('ts-loader'),
+        test: /\.ts$/,
         exclude: /node_modules/,
-        options: {
-          projectReferences: true,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            projectReferences: true,
+            transpileOnly: false,
+          },
         },
       },
-      // {
-      //   test: /\.tsx?$/,
-      //   include: [WEB_PATH],
-      //   // exclude: [/node_modules/, SRC_PATH],
-      //   loader: 'ts-loader',
-      //   options: {
-      //     instance: 'web',
-      //     configFile: path.join(WEB_PATH, 'tsconfig.json'),
-      //   },
-      // },
-      // {
-      //   test: /\.tsx?$/,
-      //   include: [WORKER_PATH],
-      //   loader: 'ts-loader',
-      //   options: {
-      //     instance: 'worker',
-      //     configFile: path.join(WORKER_PATH, 'tsconfig.json'),
-      //   },
-      // },
-      // {
-      //   test: /\.tsx?$/,
-      //   include: [COMMON_PATH],
-      //   loader: 'ts-loader',
-      //   options: {
-      //     instance: 'other',
-      //     configFile: path.join(COMMON_PATH, 'tsconfig.json'),
-      //   },
-      // },
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
-  output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'dist'),
+    extensions: ['.ts', '.js'],
+    // modules: ['node_modules', path.resolve(__dirname)],
+    plugins: [new TsconfigPathsPlugin({})],
   },
   plugins: [
+    new webpack.NoEmitOnErrorsPlugin(),
+    new webpack.WatchIgnorePlugin({ paths: [/\.js$/, /\.d\.ts$/] }),
     new HtmlWebpackPlugin({
       chunks: ['main'],
-      template: 'index.html',
+      template: './src/index.html',
     }),
   ],
   devServer: {
     host: '0.0.0.0',
-    proxy: {
-      '!/src/liquidfun/**': 'http://localhost:5555',
-      '!/static/**': 'http://localhost:5555',
-    },
+    inline: true,
+    progress: true,
+    compress: true,
+    publicPath: '/',
+    contentBase: path.join(__dirname, 'static'),
   },
 };

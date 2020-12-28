@@ -1,0 +1,30 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": [
+      "ES2015",
+      "ES2016",
+      "ES2017",
+      "ES2018",
+      "ES2019",
+      "ES2020",
+      "DOM",
+      "WebWorker"
+    ],
+    "skipDefaultLibCheck": true,
+    // "types": ["emscripten", "liquidfun", "domproxy"],
+    // "types": ["emscripten", "liquidfun"]
+    // "typeRoots": [
+    //   "../../typings",
+    //   "../../node_modules/@types/emscripten",
+    //   "../../node_modules/@types/node"
+    // ]
+    // "types": ["emscripten", "liquidfun"],
+    // "typeRoots": ["../typings/"],
+    "rootDir": ".",
+    "outDir": "lib"
+  },
+  "references": [
+    { "path": "../common" }
+  ]
+}

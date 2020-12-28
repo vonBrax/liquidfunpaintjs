@@ -1,0 +1,10 @@
+{
+  "name": "@lfpjs/web",
+  "version": "1.0.0",
+  "description": "web module",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "license": "ISC"
+}

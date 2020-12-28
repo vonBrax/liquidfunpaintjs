@@ -1,8 +1,9 @@
 FROM ubuntu:18.04 AS build-base
 
-ARG VERSION=version_91
+ARG VERSION=version_94
 
-RUN echo "\n## Update and install dependencies" \
+RUN echo "\n## Installing Bynarien $VERSION" \
+&& echo "\n## Update and install dependencies" \
 && apt-get -qq update \
 && apt-get -qq install -y --no-install-recommends \
   ca-certificates \
@@ -12,8 +13,12 @@ RUN echo "\n## Update and install dependencies" \
 && wget -q -O binaryen-release https://github.com/WebAssembly/binaryen/releases/download/${VERSION}/binaryen-${VERSION}-x86_64-linux.tar.gz \
 && tar zxf binaryen-release \
 && mv /binaryen-${VERSION} /binaryen \
-&& echo "\n## Test binary" \
-&& /binaryen/asm2wasm --version \
+# RUN echo "\n## Test binary" \
+# && ls -la /binaryen \
+# && ls -la /binaryen/bin \
+# && ls -la /binaryen/include \
+# && ls -la /binaryen/lib64 \
+# && /binaryen/bin/asm2wasm --version \
 && echo "\n## Clean up" \
 && rm binaryen-release \
 && apt-get -qq purge -y \

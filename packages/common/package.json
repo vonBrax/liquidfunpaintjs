@@ -1,0 +1,10 @@
+{
+  "name": "@lfpjs/common",
+  "version": "1.0.0",
+  "description": "common module",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "license": "ISC"
+}

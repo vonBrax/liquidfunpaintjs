@@ -1,0 +1,10 @@
+{
+  "name": "@lfpjs/worker",
+  "version": "1.0.0",
+  "description": "worker module",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "license": "ISC"
+}

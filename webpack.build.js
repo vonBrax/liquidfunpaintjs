@@ -5,7 +5,7 @@ module.exports = {
   mode: 'production',
   entry: {
     main: './index.ts',
-    worker: './src/worker/worker.ts',
+    worker: './src/worker/index.ts',
   },
   module: {
     rules: [
